@@ -1,4 +1,5 @@
 "use client";
+import { SignedIn } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -22,17 +23,19 @@ export function MainNav({
       className={cn("flex items-center space-x-4 lg:space-x-6", className)}
       {...props}
     >
-      {navigation.map((item) => (
-        <Link
-          key={item.name}
-          href={item.link}
-          className={`text-sm font-medium ${
-            pathname === item.link ? "" : "text-muted-foreground"
-          } transition-colors hover:text-primary`}
-        >
-          {item.name}
-        </Link>
-      ))}
+      <SignedIn>
+        {navigation.map((item) => (
+          <Link
+            key={item.name}
+            href={item.link}
+            className={`text-sm font-medium ${
+              pathname === item.link ? "" : "text-muted-foreground"
+            } transition-colors hover:text-primary`}
+          >
+            {item.name}
+          </Link>
+        ))}
+      </SignedIn>
     </nav>
   );
 }

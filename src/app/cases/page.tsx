@@ -1,9 +1,13 @@
-import { SignedIn } from "@clerk/nextjs";
+import { SignedIn, auth } from "@clerk/nextjs";
 import { CaseList } from "../_components/case-list";
 import { CreateCase } from "../_components/create-case";
 import { Navbar } from "../_components/navbar";
 
-export default function Cases() {
+export default function Page() {
+  const { userId } = auth();
+
+  if (!userId) return null;
+
   return (
     <SignedIn>
       <main className="min-h-screen w-full">
