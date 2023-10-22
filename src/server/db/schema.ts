@@ -51,6 +51,8 @@ export const cases = mysqlTable("case", {
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
 
+export type Case = typeof cases.$inferSelect;
+
 export const propertyOwners = mysqlTable("property_owner", {
   id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
   createdAt: timestamp("created_at")
