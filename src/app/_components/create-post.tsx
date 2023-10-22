@@ -2,6 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Button } from "./ui/button";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 import { api } from "~/trpc/react";
 
@@ -24,20 +27,17 @@ export function CreatePost() {
       }}
       className="flex flex-col gap-2"
     >
-      <input
+      <Label htmlFor="title">Title</Label>
+      <Input
         type="text"
+        id="title"
         placeholder="Title"
         value={name}
         onChange={(e) => setName(e.target.value)}
-        className="w-full rounded-full px-4 py-2 text-black"
       />
-      <button
-        type="submit"
-        className="rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20"
-        disabled={createPost.isLoading}
-      >
+      <Button type="submit" disabled={createPost.isLoading}>
         {createPost.isLoading ? "Submitting..." : "Submit"}
-      </button>
+      </Button>
     </form>
   );
 }
