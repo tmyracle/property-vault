@@ -174,7 +174,7 @@ export function EditCaseDialog({ case: caseProp }: EditCaseDialogProps) {
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormDescription>The date of the case.</FormDescription>
+                  <FormDescription>When the case was filed.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

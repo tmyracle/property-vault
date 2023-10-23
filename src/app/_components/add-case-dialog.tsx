@@ -150,7 +150,7 @@ export function AddCaseDialog() {
                       />
                     </PopoverContent>
                   </Popover>
-                  <FormDescription>The date of the case.</FormDescription>
+                  <FormDescription>When the case was filed.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
