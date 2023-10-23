@@ -5,6 +5,7 @@ import { columns } from "../_components/columns";
 import { api } from "~/trpc/server";
 
 import { Button } from "../_components/ui/button";
+import { AddCaseDialog } from "../_components/add-case-dialog";
 
 export default async function Page() {
   const { userId } = auth();
@@ -24,7 +25,7 @@ export default async function Page() {
               </p>
             </div>
             <div>
-              <Button>Add Case</Button>
+              <AddCaseDialog />
             </div>
           </div>
           <DataTable data={cases} columns={columns} />

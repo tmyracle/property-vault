@@ -1,3 +1,4 @@
+import { eq } from "drizzle-orm";
 import { z } from "zod";
 
 import {
@@ -9,7 +10,9 @@ import { cases } from "~/server/db/schema";
 
 export const caseRouter = createTRPCRouter({
   getAllCases: publicProcedure.query(({ ctx }) => {
-    return ctx.db.query.cases.findMany();
+    return ctx.db.query.cases.findMany({
+      where: eq(cases.orgId, ctx.auth.orgId!),
+    });
   }),
 
   create: protectedProcedure
