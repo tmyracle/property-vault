@@ -79,15 +79,10 @@ export function EditCaseDialog({ case: caseProp }: EditCaseDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger
-        asChild
-        onSelect={(e) => {
-          e.preventDefault();
-          setOpen(true);
-        }}
-      >
+      <DialogTrigger asChild>
         <div className="w-full">Edit</div>
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit case</DialogTitle>
