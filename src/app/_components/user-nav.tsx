@@ -24,7 +24,7 @@ export function UserNav() {
               src={user?.imageUrl}
               alt={`${user?.firstName} ${user?.lastName}`}
             />
-            <AvatarFallback>{`${user?.firstName?.[0]?.toUpperCase()}${user?.lastName?.[0]?.toUpperCase()}`}</AvatarFallback>
+            <AvatarFallback>{`${user?.emailAddresses[0]?.emailAddress[0]?.toUpperCase()}`}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>

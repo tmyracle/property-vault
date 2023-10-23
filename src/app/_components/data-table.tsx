@@ -6,6 +6,7 @@ import {
   type ColumnFiltersState,
   type SortingState,
   type VisibilityState,
+  type FilterFn,
   flexRender,
   getCoreRowModel,
   getFacetedRowModel,
@@ -15,6 +16,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { rankItem, type RankingInfo } from "@tanstack/match-sorter-utils";
 
 import {
   Table,
@@ -29,9 +31,36 @@ import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
 
 interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+  columns: (ColumnDef<TData, TValue> & { accessorFn?: unknown })[];
   data: TData[];
 }
+
+declare module "@tanstack/table-core" {
+  interface FilterFns {
+    fuzzy: FilterFn<unknown>;
+  }
+  interface FilterMeta {
+    itemRank: RankingInfo;
+  }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+  const itemRank = rankItem(row.getValue(columnId), value);
+
+  // Store the itemRank info
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+  addMeta({
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    itemRank,
+  });
+
+  // Return if the item should be filtered in/out
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+  return itemRank.passed;
+};
 
 export function DataTable<TData, TValue>({
   columns,
@@ -44,6 +73,7 @@ export function DataTable<TData, TValue>({
     [],
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [globalFilter, setGlobalFilter] = React.useState<string>("");
 
   const table = useReactTable({
     data,
@@ -53,6 +83,10 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       rowSelection,
       columnFilters,
+      globalFilter,
+    },
+    filterFns: {
+      fuzzy: fuzzyFilter,
     },
     enableRowSelection: true,
     onRowSelectionChange: setRowSelection,
@@ -60,6 +94,8 @@ export function DataTable<TData, TValue>({
     onColumnFiltersChange: setColumnFilters,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: fuzzyFilter,
     getFilteredRowModel: getFilteredRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -69,7 +105,11 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DataTableToolbar table={table} />
+      <DataTableToolbar
+        table={table}
+        globalFilter={globalFilter}
+        setGlobalFilter={setGlobalFilter}
+      />
       <div className="rounded-md border">
         <Table>
           <TableHeader>

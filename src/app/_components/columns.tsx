@@ -8,9 +8,11 @@ import { type Case } from "~/server/db/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 
-export const columns: ColumnDef<Case>[] = [
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const columns: ColumnDef<Case, any>[] = [
   {
     id: "select",
+    accessorKey: "select",
     header: ({ table }) => (
       <Checkbox
         checked={table.getIsAllPageRowsSelected()}
@@ -40,6 +42,21 @@ export const columns: ColumnDef<Case>[] = [
     enableHiding: false,
   },
   {
+    accessorKey: "caseDate",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Date" />
+    ),
+    cell: ({ row }) => (
+      <div className="">
+        {row.getValue("caseDate")
+          ? new Date(row.getValue("caseDate")).toLocaleDateString()
+          : ""}
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
     accessorKey: "name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Name" />
@@ -65,6 +82,14 @@ export const columns: ColumnDef<Case>[] = [
   },
   {
     id: "actions",
-    cell: ({ row }) => <DataTableRowActions row={row} />,
+    accessorKey: "actions",
+    header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
+    cell: ({ row }) => (
+      <div className="flex !justify-end">
+        <DataTableRowActions row={row} />
+      </div>
+    ),
+    enableSorting: false,
+    enableHiding: false,
   },
 ];

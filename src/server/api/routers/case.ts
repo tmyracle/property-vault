@@ -21,6 +21,7 @@ export const caseRouter = createTRPCRouter({
         name: z.string(),
         caseNumber: z.string(),
         description: z.string().nullable(),
+        caseDate: z.date().nullable(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -28,6 +29,7 @@ export const caseRouter = createTRPCRouter({
         name: input.name,
         caseNumber: input.caseNumber,
         description: input.description,
+        caseDate: input.caseDate,
         createdBy: ctx.auth.userId,
         orgId: ctx.auth.orgId!,
       });

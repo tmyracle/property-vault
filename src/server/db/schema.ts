@@ -48,6 +48,7 @@ export const cases = mysqlTable("case", {
   caseNumber: varchar("case_number", { length: 256 }).notNull(),
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   description: text("description"),
+  caseDate: timestamp("case_date"),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
 

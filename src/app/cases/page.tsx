@@ -1,10 +1,7 @@
 import { SignedIn, auth } from "@clerk/nextjs";
+import { api } from "~/trpc/server";
 import { DataTable } from "../_components/data-table";
 import { columns } from "../_components/columns";
-
-import { api } from "~/trpc/server";
-
-import { Button } from "../_components/ui/button";
 import { AddCaseDialog } from "../_components/add-case-dialog";
 
 export default async function Page() {
@@ -21,7 +18,7 @@ export default async function Page() {
             <div>
               <h2 className="text-2xl font-bold tracking-tight">Cases</h2>
               <p className="text-muted-foreground">
-                Here&apos;s a list of your cases!
+                List of cases with property being tracked.
               </p>
             </div>
             <div>
