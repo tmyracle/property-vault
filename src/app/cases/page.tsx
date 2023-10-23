@@ -1,16 +1,9 @@
-import { promises as fs } from "fs";
-import path from "path";
-import { z } from "zod";
 import { SignedIn, auth } from "@clerk/nextjs";
-import { taskSchema } from "../_components/data/schema";
-import { CaseList } from "../_components/case-list";
-import { CreateCase } from "../_components/create-case";
-import { Navbar } from "../_components/navbar";
 import { DataTable } from "../_components/data-table";
 import { columns } from "../_components/columns";
-import { type Task } from "../_components/data/schema";
+
 import { api } from "~/trpc/server";
-import { type Case } from "~/server/db/schema";
+
 import { Button } from "../_components/ui/button";
 
 export default async function Page() {
