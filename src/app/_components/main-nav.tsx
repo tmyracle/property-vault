@@ -29,7 +29,7 @@ export function MainNav({
             key={item.name}
             href={item.link}
             className={`text-sm font-medium ${
-              pathname === item.link ? "" : "text-muted-foreground"
+              pathname.startsWith(item.link) ? "" : "text-muted-foreground"
             } transition-colors hover:text-primary`}
           >
             {item.name}

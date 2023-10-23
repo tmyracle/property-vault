@@ -67,12 +67,15 @@ export const propertyOwners = mysqlTable("property_owner", {
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
 
+export type PropertyOwner = typeof propertyOwners.$inferSelect;
+
 export const addresses = mysqlTable("address", {
   id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
   createdAt: timestamp("created_at")
     .default(sql`CURRENT_TIMESTAMP`)
     .notNull(),
   updatedAt: timestamp("updated_at").onUpdateNow(),
+  ownerId: bigint("owner_id", { mode: "number" }),
   street: varchar("street", { length: 256 }).notNull(),
   unit: varchar("unit", { length: 256 }),
   city: varchar("city", { length: 256 }),
@@ -81,6 +84,8 @@ export const addresses = mysqlTable("address", {
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
+
+export type Address = typeof addresses.$inferSelect;
 
 export const deposits = mysqlTable("deposit", {
   id: bigint("id", { mode: "number" }).primaryKey().autoincrement(),
@@ -96,6 +101,8 @@ export const deposits = mysqlTable("deposit", {
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
+
+export type Deposit = typeof deposits.$inferSelect;
 
 export const depositsRelations = relations(deposits, ({ one }) => ({
   case: one(cases, {
@@ -218,8 +225,20 @@ export const casesRelations = relations(cases, ({ many }) => ({
 
 export const propertyOwnersRelations = relations(
   propertyOwners,
-  ({ many }) => ({
+  ({ many, one }) => ({
     deposits: many(deposits),
     disbursementRequests: many(disbursementRequests),
+    addresses: many(addresses),
+    case: one(cases, {
+      fields: [propertyOwners.id],
+      references: [cases.id],
+    }),
   }),
 );
+
+export const addressesRelations = relations(addresses, ({ one }) => ({
+  propertyOwner: one(propertyOwners, {
+    fields: [addresses.ownerId],
+    references: [propertyOwners.id],
+  }),
+}));

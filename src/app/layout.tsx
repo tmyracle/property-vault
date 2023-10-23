@@ -6,7 +6,8 @@ import cn from "classnames";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCReactProvider } from "~/trpc/react";
-import { Navbar } from "./_components/navbar";
+import { Navbar } from "~/app/_components/navbar";
+import { Toaster } from "~/app/_components/ui/toaster";
 
 export const fontSans = Inter({
   subsets: ["latin"],
@@ -26,18 +27,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={cn(
+      <body
+        className={cn(
           "min-h-screen bg-background font-sans antialiased",
-          fontSans.variable
-        )}>
+          fontSans.variable,
+        )}
+      >
         <TRPCReactProvider headers={headers()}>
           <ClerkProvider>
             <main className="min-h-screen w-full">
               <Navbar />
               {children}
             </main>
+            <Toaster />
           </ClerkProvider>
-        </TRPCReactProvider>        
+        </TRPCReactProvider>
       </body>
     </html>
   );

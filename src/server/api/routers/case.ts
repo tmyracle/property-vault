@@ -9,9 +9,26 @@ import {
 import { cases } from "~/server/db/schema";
 
 export const caseRouter = createTRPCRouter({
-  getAllCases: publicProcedure.query(({ ctx }) => {
+  getAllCases: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.cases.findMany({
       where: eq(cases.orgId, ctx.auth.orgId!),
+    });
+  }),
+
+  getCase: publicProcedure.input(z.number()).query(async ({ ctx, input }) => {
+    return ctx.db.query.cases.findFirst({
+      where: eq(cases.id, input),
+      with: {
+        deposits: {
+          with: {
+            propertyOwner: {
+              with: {
+                addresses: true,
+              },
+            },
+          },
+        },
+      },
     });
   }),
 
