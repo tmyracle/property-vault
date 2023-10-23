@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
 import { type Row } from "@tanstack/react-table";
 
@@ -14,18 +15,21 @@ import {
 } from "~/app/_components/ui/dropdown-menu";
 
 import { caseSchema } from "./data/schema";
+import { EditCaseDialog } from "./edit-case-dialog";
+import { type Case } from "~/server/db/schema";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
 }
 
-export function DataTableRowActions<TData>({
+export function DataTableRowActions<TData extends Case>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const caseRow = caseSchema.parse(row.original);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
@@ -36,7 +40,15 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Edit</DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={(e) => {
+            e.preventDefault();
+            setMenuOpen(true);
+          }}
+          className="hover:cursor-pointer"
+        >
+          <EditCaseDialog case={row.original} />
+        </DropdownMenuItem>
         <DropdownMenuItem>Make a copy</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => console.log(caseRow.id)}>

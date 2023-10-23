@@ -34,4 +34,26 @@ export const caseRouter = createTRPCRouter({
         orgId: ctx.auth.orgId!,
       });
     }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        name: z.string(),
+        caseNumber: z.string(),
+        description: z.string().nullable(),
+        caseDate: z.date().nullable(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .update(cases)
+        .set({
+          name: input.name,
+          caseNumber: input.caseNumber,
+          description: input.description,
+          caseDate: input.caseDate,
+        })
+        .where(eq(cases.id, input.id));
+    }),
 });
