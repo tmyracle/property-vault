@@ -134,7 +134,7 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
               control={form.control}
               render={({ field }) => (
                 <FormItem className="col-span-2">
-                  <FormLabel>Case number</FormLabel>
+                  <FormLabel>Item number</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Item number" />
                   </FormControl>

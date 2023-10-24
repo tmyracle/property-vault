@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 
@@ -16,7 +17,7 @@ export const caseRouter = createTRPCRouter({
   }),
 
   getCase: publicProcedure.input(z.number()).query(async ({ ctx, input }) => {
-    return ctx.db.query.cases.findFirst({
+    const result = await ctx.db.query.cases.findFirst({
       where: eq(cases.id, input),
       with: {
         deposits: {
@@ -36,6 +37,10 @@ export const caseRouter = createTRPCRouter({
         disbursements: true,
       },
     });
+    if (result && result.orgId !== ctx.auth.orgId) {
+      throw new TRPCError({ code: "FORBIDDEN" });
+    }
+    return result;
   }),
 
   create: protectedProcedure

@@ -15,6 +15,8 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
+  type Cell,
+  type Row,
 } from "@tanstack/react-table";
 import { rankItem, type RankingInfo } from "@tanstack/match-sorter-utils";
 
@@ -29,6 +31,8 @@ import {
 
 import { DataTablePagination } from "./data-table-pagination";
 import { DataTableToolbar } from "./data-table-toolbar";
+
+import { useRouter } from "next/navigation";
 
 interface DataTableProps<TData, TValue> {
   columns: (ColumnDef<TData, TValue> & { accessorFn?: unknown })[];
@@ -74,6 +78,7 @@ export function DataTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
+  const router = useRouter();
 
   const table = useReactTable({
     data,
@@ -102,6 +107,12 @@ export function DataTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
+
+  const handleNavigation = (cell: Cell<TData, TValue>, row: Row<TData>) => {
+    if (cell.column.columnDef.id !== "actions") {
+      router.push(`/cases/${(row.original as { id: number }).id}`);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -138,7 +149,15 @@ export function DataTable<TData, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={
+                        cell.column.columnDef.id === "actions"
+                          ? ""
+                          : "hover:cursor-pointer"
+                      }
+                      onClick={() => handleNavigation(cell, row)}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
