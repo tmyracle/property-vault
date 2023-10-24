@@ -2,6 +2,7 @@ import { postRouter } from "~/server/api/routers/post";
 import { createTRPCRouter } from "~/server/api/trpc";
 import { caseRouter } from "./routers/case";
 import { depositRouter } from "./routers/deposit";
+import { disbursementRequestRouter } from "./routers/disbursement-request";
 
 /**
  * This is the primary router for your server.
@@ -12,6 +13,7 @@ export const appRouter = createTRPCRouter({
   post: postRouter,
   case: caseRouter,
   deposit: depositRouter,
+  disbursementRequest: disbursementRequestRouter,
 });
 
 // export type definition of API

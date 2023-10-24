@@ -28,6 +28,12 @@ export const caseRouter = createTRPCRouter({
             },
           },
         },
+        disbursementRequests: {
+          with: {
+            propertyOwner: true,
+          },
+        },
+        disbursements: true,
       },
     });
   }),

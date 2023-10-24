@@ -1,6 +1,7 @@
 import { SignedIn, auth } from "@clerk/nextjs";
 import { AddDepositDialog } from "~/app/_components/add-deposit-dialog";
 import { DepositList } from "~/app/_components/deposit-list";
+import { DisbursementList } from "~/app/_components/disbursement-list";
 import {
   Card,
   CardContent,
@@ -22,6 +23,28 @@ export default async function Page({ params }: { params: { id: string } }) {
     if (!caseForPage) return 0;
     caseForPage.deposits.forEach((deposit) => {
       total += Number(deposit.amount);
+    });
+    return total.toFixed(2);
+  }
+
+  function calculatedTotalDisbursements() {
+    let total = 0;
+    if (!caseForPage) return 0;
+    caseForPage.disbursementRequests.forEach((disbursementRequest) => {
+      if (disbursementRequest.status === "approved") {
+        total += Number(disbursementRequest.amount);
+      }
+    });
+    return total.toFixed(2);
+  }
+
+  function calculatedPendingDisbursements() {
+    let total = 0;
+    if (!caseForPage) return 0;
+    caseForPage.disbursementRequests.forEach((disbursementRequest) => {
+      if (disbursementRequest.status === "pending") {
+        total += Number(disbursementRequest.amount);
+      }
     });
     return total.toFixed(2);
   }
@@ -115,7 +138,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$24,543.89</div>
+                <div className="text-2xl font-bold">{`$${calculatedTotalDisbursements()}`}</div>
               </CardContent>
             </Card>
             <Card>
@@ -137,7 +160,7 @@ export default async function Page({ params }: { params: { id: string } }) {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">$20,421.12</div>
+                <div className="text-2xl font-bold">{`$${calculatedPendingDisbursements()}`}</div>
               </CardContent>
             </Card>
           </div>
@@ -161,10 +184,9 @@ export default async function Page({ params }: { params: { id: string } }) {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">123 Main St.</div>
-                <p className="text-xs text-muted-foreground">
-                  +20.1% from last month
-                </p>
+                <DisbursementList
+                  disbursementRequests={caseForPage.disbursementRequests}
+                />
               </CardContent>
             </Card>
           </div>

@@ -134,6 +134,8 @@ export const disbursementRequests = mysqlTable("disbursement_request", {
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
 
+export type DisbursementRequest = typeof disbursementRequests.$inferSelect;
+
 export const disbursementRequestsRelations = relations(
   disbursementRequests,
   ({ one }) => ({
