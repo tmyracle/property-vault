@@ -29,7 +29,9 @@ export function MainNav({
             key={item.name}
             href={item.link}
             className={`text-sm font-medium ${
-              pathname.startsWith(item.link) ? "" : "text-muted-foreground"
+              pathname.split("/")[1] === item.link.split("/")[1]
+                ? ""
+                : "text-muted-foreground"
             } transition-colors hover:text-primary`}
           >
             {item.name}

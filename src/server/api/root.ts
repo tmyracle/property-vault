@@ -3,6 +3,7 @@ import { createTRPCRouter } from "~/server/api/trpc";
 import { caseRouter } from "./routers/case";
 import { depositRouter } from "./routers/deposit";
 import { disbursementRequestRouter } from "./routers/disbursement-request";
+import { userRouter } from "./routers/user";
 
 /**
  * This is the primary router for your server.
@@ -11,6 +12,7 @@ import { disbursementRequestRouter } from "./routers/disbursement-request";
  */
 export const appRouter = createTRPCRouter({
   post: postRouter,
+  user: userRouter,
   case: caseRouter,
   deposit: depositRouter,
   disbursementRequest: disbursementRequestRouter,

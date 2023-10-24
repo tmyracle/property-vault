@@ -13,7 +13,7 @@ export function Navbar() {
             </SignedIn>
             <div className="ml-auto flex items-center space-x-4">
               <SignedIn>
-                <OrganizationSwitcher />
+                <OrganizationSwitcher hidePersonal={true} />
                 <UserNav />
               </SignedIn>
             </div>
