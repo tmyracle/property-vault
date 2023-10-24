@@ -4,33 +4,31 @@ import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const userRouter = createTRPCRouter({
-  getUsers: protectedProcedure
-    .input(z.string())
-    .query(async ({ ctx, input }) => {
-      const membershipList =
-        await clerkClient.organizations.getOrganizationMembershipList({
-          organizationId: input,
-        });
-
-      const userIds: string[] = [];
-      membershipList.forEach((membership) => {
-        userIds.push(membership.publicUserData?.userId ?? "");
+  getUsers: protectedProcedure.input(z.string()).query(async ({ input }) => {
+    const membershipList =
+      await clerkClient.organizations.getOrganizationMembershipList({
+        organizationId: input,
       });
 
-      const users = await clerkClient.users.getUserList({
-        userId: userIds,
-      });
+    const userIds: string[] = [];
+    membershipList.forEach((membership) => {
+      userIds.push(membership.publicUserData?.userId ?? "");
+    });
 
-      console.log(users);
+    const users = await clerkClient.users.getUserList({
+      userId: userIds,
+    });
 
-      return users;
-    }),
+    console.log(users);
+
+    return users;
+  }),
 
   getInvitations: protectedProcedure
     .input(z.string())
     .query(async ({ input }) => {
       const invitations =
-        await clerkClient.organizations.getPendingOrganizationInvitationList({
+        await clerkClient.organizations.getOrganizationInvitationList({
           organizationId: input,
         });
       return invitations;

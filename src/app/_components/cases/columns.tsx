@@ -1,37 +1,23 @@
 "use client";
 
 import { type ColumnDef } from "@tanstack/react-table";
-
-import { Checkbox } from "~/app/_components/ui/checkbox";
-
-import { type Case } from "~/server/db/schema";
+import { type Case, type Deposit } from "~/server/db/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
+import { type Row } from "@tanstack/react-table";
+
+interface ExtendedCase extends Case {
+  deposits: Deposit[];
+}
+
+const calculateDeposits = (row: Row<ExtendedCase>) => {
+  return row.original.deposits.reduce((acc, deposit) => {
+    return acc + Number(deposit.amount);
+  }, 0);
+};
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const columns: ColumnDef<Case, any>[] = [
-  {
-    id: "select",
-    accessorKey: "select",
-    header: ({ table }) => (
-      <Checkbox
-        checked={table.getIsAllPageRowsSelected()}
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-        aria-label="Select all"
-        className="translate-y-[2px]"
-      />
-    ),
-    cell: ({ row }) => (
-      <Checkbox
-        checked={row.getIsSelected()}
-        onCheckedChange={(value) => row.toggleSelected(!!value)}
-        aria-label="Select row"
-        className="translate-y-[2px]"
-      />
-    ),
-    enableSorting: false,
-    enableHiding: false,
-  },
+export const columns: ColumnDef<ExtendedCase, any>[] = [
   {
     accessorKey: "caseNumber",
     header: ({ column }) => (
@@ -64,6 +50,23 @@ export const columns: ColumnDef<Case, any>[] = [
     cell: ({ row }) => <div className="">{row.getValue("name")}</div>,
     enableSorting: false,
     enableHiding: false,
+  },
+  {
+    accessorKey: "deposits",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Deposits" />
+    ),
+    cell: ({ row }) => (
+      <div>
+        {" "}
+        {new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(calculateDeposits(row))}
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: true,
   },
   {
     accessorKey: "description",

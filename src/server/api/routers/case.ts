@@ -13,6 +13,9 @@ export const caseRouter = createTRPCRouter({
   getAllCases: protectedProcedure.query(({ ctx }) => {
     return ctx.db.query.cases.findMany({
       where: eq(cases.orgId, ctx.auth.orgId!),
+      with: {
+        deposits: true,
+      },
     });
   }),
 

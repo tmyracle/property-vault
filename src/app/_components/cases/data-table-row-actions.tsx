@@ -49,7 +49,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
 import { type Case } from "~/server/db/schema";
 
-import { caseSchema } from "./data/schema";
+import { caseSchema } from "~/app/_components/cases/data/schema";
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;

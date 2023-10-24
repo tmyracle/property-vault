@@ -39,4 +39,14 @@ export const disbursementRequestRouter = createTRPCRouter({
         },
       });
     }),
+
+  getAllRequests: protectedProcedure.query(({ ctx }) => {
+    return ctx.db.query.disbursementRequests.findMany({
+      where: eq(disbursementRequests.orgId, ctx.auth.orgId!),
+      with: {
+        propertyOwner: true,
+        case: true,
+      },
+    });
+  }),
 });
