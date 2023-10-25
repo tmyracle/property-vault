@@ -8,6 +8,7 @@ import { Input } from "~/app/_components/ui/input";
 import { DisbursementsTableViewOptions } from "./disbursements-table-view-options";
 import { DisbursementsTableFacetedFilter } from "./disbursements-table-faceted-filter";
 import { statuses } from "./data/data";
+import { api } from "~/trpc/react";
 //import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DisbursementsTableToolbarProps<TData> {
@@ -22,6 +23,13 @@ export function DisbursementsTableToolbar<TData>({
   setGlobalFilter,
 }: DisbursementsTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
+  const uniqueCases = api.disbursementRequest.getUniqueCaseNumbers.useQuery();
+
+  const caseNumbers =
+    uniqueCases.data?.map((caseNumber) => ({
+      value: caseNumber,
+      label: caseNumber,
+    })) ?? [];
 
   return (
     <div className="flex items-center justify-between">
@@ -34,6 +42,13 @@ export function DisbursementsTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
+        {table.getColumn("caseNumber") && (
+          <DisbursementsTableFacetedFilter
+            column={table.getColumn("caseNumber")}
+            title="Case"
+            options={caseNumbers}
+          />
+        )}
         {table.getColumn("status") && (
           <DisbursementsTableFacetedFilter
             column={table.getColumn("status")}

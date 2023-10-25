@@ -1,7 +1,4 @@
 import {
-  ArrowDownIcon,
-  ArrowRightIcon,
-  ArrowUpIcon,
   CheckCircledIcon,
   CrossCircledIcon,
   StopwatchIcon,
@@ -37,23 +34,5 @@ export const statuses = [
     value: "rejected",
     label: "Rejected",
     icon: CrossCircledIcon,
-  },
-];
-
-export const priorities = [
-  {
-    label: "Low",
-    value: "low",
-    icon: ArrowDownIcon,
-  },
-  {
-    label: "Medium",
-    value: "medium",
-    icon: ArrowRightIcon,
-  },
-  {
-    label: "High",
-    value: "high",
-    icon: ArrowUpIcon,
   },
 ];

@@ -108,4 +108,19 @@ export const disbursementRequestRouter = createTRPCRouter({
         })
         .where(eq(disbursementRequests.id, input.id));
     }),
+
+  getUniqueCaseNumbers: protectedProcedure.query(async ({ ctx }) => {
+    const caseNumbers = await ctx.db.query.disbursementRequests.findMany({
+      where: eq(disbursementRequests.orgId, ctx.auth.orgId!),
+      with: {
+        case: true,
+      },
+    });
+
+    const uniqueCaseNumbers = caseNumbers
+      .map((request) => request.case.caseNumber)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    return uniqueCaseNumbers;
+  }),
 });

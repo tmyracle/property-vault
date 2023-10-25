@@ -24,10 +24,12 @@ export const columns: ColumnDef<ExtendedDisbursementRequest, any>[] = [
       <DisbursementsTableColumnHeader column={column} title="Case" />
     ),
     cell: ({ row }) => (
-      <div className="">
-        {row.original.case?.caseNumber ?? JSON.stringify(row.original)}
-      </div>
+      <div className="">{row.original.case?.caseNumber ?? ""}</div>
     ),
+    filterFn: (row, id, value) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      return value.includes(row.original.case.caseNumber);
+    },
     enableSorting: true,
     enableHiding: false,
   },

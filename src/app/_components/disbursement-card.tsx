@@ -16,7 +16,6 @@ import { Cross1Icon } from "@radix-ui/react-icons";
 import { api } from "~/trpc/react";
 import { useToast } from "~/app/_components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
 
 interface DisbursementCardProps {
   disbursement: ExtendedDisbursementRequest;
