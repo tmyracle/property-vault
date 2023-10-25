@@ -1,11 +1,11 @@
 import { auth, SignedIn } from "@clerk/nextjs";
 import { api } from "~/trpc/server";
-import { DisbursementsTable } from "~/app/_components/disbursements/disbursements-table";
-import { columns } from "~/app/_components/disbursements/columns";
+import { DisbursementContainer } from "../_components/disbursement-container";
 
 export default async function Disbursements() {
   const { userId } = auth();
-  const cases = await api.case.getAllCases.query();
+  const disbursementRequests =
+    await api.disbursementRequest.getAllRequests.query();
 
   if (!userId) return null;
 
@@ -24,7 +24,7 @@ export default async function Disbursements() {
             </div>
             <div></div>
           </div>
-          <DisbursementsTable columns={columns} data={cases} />
+          <DisbursementContainer disbursementRequests={disbursementRequests} />
         </div>
       </div>
     </SignedIn>

@@ -6,8 +6,8 @@ import { type Table } from "@tanstack/react-table";
 import { Button } from "~/app/_components/ui/button";
 import { Input } from "~/app/_components/ui/input";
 import { DisbursementsTableViewOptions } from "./disbursements-table-view-options";
-
-//import { priorities, statuses } from "./data/data";
+import { DisbursementsTableFacetedFilter } from "./disbursements-table-faceted-filter";
+import { statuses } from "./data/data";
 //import { DataTableFacetedFilter } from "./data-table-faceted-filter";
 
 interface DisbursementsTableToolbarProps<TData> {
@@ -34,6 +34,13 @@ export function DisbursementsTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
+        {table.getColumn("status") && (
+          <DisbursementsTableFacetedFilter
+            column={table.getColumn("status")}
+            title="Status"
+            options={statuses}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"

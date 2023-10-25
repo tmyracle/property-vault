@@ -24,7 +24,7 @@ export default async function Page({ params }: { params: { id: string } }) {
     caseForPage.deposits.forEach((deposit) => {
       total += Number(deposit.amount);
     });
-    return total.toFixed(2);
+    return total;
   }
 
   function calculatedTotalDisbursements() {
@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         total += Number(disbursementRequest.amount);
       }
     });
-    return total.toFixed(2);
+    return total;
   }
 
   function calculatedPendingDisbursements() {
@@ -46,7 +46,7 @@ export default async function Page({ params }: { params: { id: string } }) {
         total += Number(disbursementRequest.amount);
       }
     });
-    return total.toFixed(2);
+    return total;
   }
 
   function calculatedCurrentBalance() {
@@ -55,7 +55,12 @@ export default async function Page({ params }: { params: { id: string } }) {
     caseForPage.deposits.forEach((deposit) => {
       total += Number(deposit.amount);
     });
-    return total.toFixed(2);
+    caseForPage.disbursementRequests.forEach((disbursementRequest) => {
+      if (disbursementRequest.status === "approved") {
+        total -= Number(disbursementRequest.amount);
+      }
+    });
+    return total;
   }
 
   return (
@@ -92,7 +97,12 @@ export default async function Page({ params }: { params: { id: string } }) {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{`$${calculatedCurrentBalance()}`}</div>
+                <div className="text-2xl font-bold">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(calculatedCurrentBalance())}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -115,7 +125,10 @@ export default async function Page({ params }: { params: { id: string } }) {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
-                  {`$${calculatedTotalDeposits()}`}
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(calculatedTotalDeposits())}
                 </div>
               </CardContent>
             </Card>
@@ -138,7 +151,12 @@ export default async function Page({ params }: { params: { id: string } }) {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{`$${calculatedTotalDisbursements()}`}</div>
+                <div className="text-2xl font-bold">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(calculatedTotalDisbursements())}
+                </div>
               </CardContent>
             </Card>
             <Card>
@@ -160,7 +178,12 @@ export default async function Page({ params }: { params: { id: string } }) {
                 </svg>
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">{`$${calculatedPendingDisbursements()}`}</div>
+                <div className="text-2xl font-bold">
+                  {new Intl.NumberFormat("en-US", {
+                    style: "currency",
+                    currency: "USD",
+                  }).format(calculatedPendingDisbursements())}
+                </div>
               </CardContent>
             </Card>
           </div>

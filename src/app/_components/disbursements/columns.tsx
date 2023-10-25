@@ -1,41 +1,45 @@
 "use client";
 
 import { type ColumnDef } from "@tanstack/react-table";
-import { type Case, type Deposit } from "~/server/db/schema";
+import {
+  type Case,
+  type PropertyOwner,
+  type DisbursementRequest,
+} from "~/server/db/schema";
+import { statuses } from "./data/data";
 import { DisbursementsTableColumnHeader } from "./disbursements-table-column-header";
 import { DisbursementsTableRowActions } from "./disbursements-table-row-actions";
-import { type Row } from "@tanstack/react-table";
+import { StatusBadge } from "../disbursement-card";
 
-interface ExtendedCase extends Case {
-  deposits: Deposit[];
+interface ExtendedDisbursementRequest extends DisbursementRequest {
+  case: Case;
+  propertyOwner: PropertyOwner;
+  requester: string;
 }
-
-const calculateDeposits = (row: Row<ExtendedCase>) => {
-  return row.original.deposits.reduce((acc, deposit) => {
-    return acc + Number(deposit.amount);
-  }, 0);
-};
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const columns: ColumnDef<ExtendedCase, any>[] = [
+export const columns: ColumnDef<ExtendedDisbursementRequest, any>[] = [
   {
     accessorKey: "caseNumber",
     header: ({ column }) => (
       <DisbursementsTableColumnHeader column={column} title="Case" />
     ),
-    cell: ({ row }) => <div className="">{row.getValue("caseNumber")}</div>,
+    cell: ({ row }) => (
+      <div className="">
+        {row.original.case?.caseNumber ?? JSON.stringify(row.original)}
+      </div>
+    ),
     enableSorting: true,
     enableHiding: false,
   },
   {
-    accessorKey: "caseDate",
+    accessorKey: "date",
     header: ({ column }) => (
       <DisbursementsTableColumnHeader column={column} title="Date" />
     ),
     cell: ({ row }) => (
       <div className="">
-        {row.getValue("caseDate")
-          ? new Date(row.getValue("caseDate")).toLocaleDateString()
+        {row.original.createdAt
+          ? new Date(row.original.createdAt).toLocaleDateString()
           : ""}
       </div>
     ),
@@ -43,18 +47,9 @@ export const columns: ColumnDef<ExtendedCase, any>[] = [
     enableHiding: true,
   },
   {
-    accessorKey: "name",
+    accessorKey: "amount",
     header: ({ column }) => (
-      <DisbursementsTableColumnHeader column={column} title="Name" />
-    ),
-    cell: ({ row }) => <div className="">{row.getValue("name")}</div>,
-    enableSorting: false,
-    enableHiding: false,
-  },
-  {
-    accessorKey: "deposits",
-    header: ({ column }) => (
-      <DisbursementsTableColumnHeader column={column} title="Deposits" />
+      <DisbursementsTableColumnHeader column={column} title="Amount" />
     ),
     cell: ({ row }) => (
       <div>
@@ -62,25 +57,67 @@ export const columns: ColumnDef<ExtendedCase, any>[] = [
         {new Intl.NumberFormat("en-US", {
           style: "currency",
           currency: "USD",
-        }).format(calculateDeposits(row))}
+        }).format(row.getValue("amount"))}
       </div>
     ),
     enableSorting: true,
     enableHiding: true,
   },
   {
-    accessorKey: "description",
+    accessorKey: "disburseTo",
     header: ({ column }) => (
-      <DisbursementsTableColumnHeader column={column} title="Description" />
+      <DisbursementsTableColumnHeader column={column} title="Disburse To" />
     ),
     cell: ({ row }) => {
       return (
         <div className="flex space-x-2">
-          <span className="grow truncate font-medium">
-            {row.getValue("description")}
+          <span className="grow truncate">
+            {row.original.distributeTo === "property_owner"
+              ? "Owner"
+              : "Forfeit"}
           </span>
         </div>
       );
+    },
+  },
+  {
+    accessorKey: "requester",
+    header: ({ column }) => (
+      <DisbursementsTableColumnHeader column={column} title="Requested By" />
+    ),
+    cell: ({ row }) => {
+      return (
+        <div className="flex space-x-2">
+          <span className="grow truncate capitalize">
+            {row.original.requester}
+          </span>
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "status",
+    header: ({ column }) => (
+      <DisbursementsTableColumnHeader column={column} title="Status" />
+    ),
+    cell: ({ row }) => {
+      const status = statuses.find(
+        (status) => status.value === row.getValue("status"),
+      );
+
+      if (!status) {
+        return null;
+      }
+
+      return (
+        <div className="flex space-x-2">
+          <StatusBadge status={row.original.status} />
+        </div>
+      );
+    },
+    filterFn: (row, id, value) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      return value.includes(row.getValue(id));
     },
   },
   {

@@ -32,11 +32,11 @@ import {
 import { DisbursementsTablePagination } from "./disbursements-table-pagination";
 import { DisbursementsTableToolbar } from "./disbursements-table-toolbar";
 
-import { useRouter } from "next/navigation";
-
 interface DisbursementsTableProps<TData, TValue> {
   columns: (ColumnDef<TData, TValue> & { accessorFn?: unknown })[];
   data: TData[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setSelectedDisbursementRequest: (value: any) => void;
 }
 
 declare module "@tanstack/table-core" {
@@ -69,6 +69,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 export function DisbursementsTable<TData, TValue>({
   columns,
   data,
+  setSelectedDisbursementRequest,
 }: DisbursementsTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -78,7 +79,6 @@ export function DisbursementsTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const router = useRouter();
 
   const table = useReactTable({
     data,
@@ -110,7 +110,7 @@ export function DisbursementsTable<TData, TValue>({
 
   const handleNavigation = (cell: Cell<TData, TValue>, row: Row<TData>) => {
     if (cell.column.columnDef.id !== "actions") {
-      router.push(`/cases/${(row.original as { id: number }).id}`);
+      setSelectedDisbursementRequest(row.original);
     }
   };
 

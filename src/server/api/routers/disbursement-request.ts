@@ -4,6 +4,8 @@ import { eq } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { disbursementRequests } from "~/server/db/schema";
+import { clerkClient } from "@clerk/nextjs";
+import { type OrganizationMembership } from "@clerk/nextjs/dist/types/server";
 
 export const disbursementRequestRouter = createTRPCRouter({
   create: protectedProcedure
@@ -40,13 +42,70 @@ export const disbursementRequestRouter = createTRPCRouter({
       });
     }),
 
-  getAllRequests: protectedProcedure.query(({ ctx }) => {
-    return ctx.db.query.disbursementRequests.findMany({
+  getAllRequests: protectedProcedure.query(async ({ ctx }) => {
+    const users = await clerkClient.organizations.getOrganizationMembershipList(
+      {
+        organizationId: ctx.auth.orgId!,
+      },
+    );
+
+    const requests = await ctx.db.query.disbursementRequests.findMany({
       where: eq(disbursementRequests.orgId, ctx.auth.orgId!),
       with: {
-        propertyOwner: true,
+        propertyOwner: {
+          with: {
+            addresses: true,
+          },
+        },
         case: true,
       },
     });
+
+    const buildName = (user: OrganizationMembership) => {
+      if (!user.publicUserData?.firstName && !user.publicUserData?.lastName) {
+        return user.publicUserData?.identifier ?? "";
+      } else {
+        return (
+          user.publicUserData.firstName + " " + user.publicUserData.lastName
+        );
+      }
+    };
+
+    const requestsWithUser = requests.map((request) => {
+      const user = users.find(
+        (user) => user.publicUserData?.userId === request.createdBy,
+      );
+      return {
+        ...request,
+        requester: user ? buildName(user) : "",
+      };
+    });
+
+    return requestsWithUser;
   }),
+
+  updateRequest: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        status: z.enum(["pending", "approved", "rejected"]),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const user = await clerkClient.users.getUser(ctx.auth.userId);
+
+      if (
+        !user ||
+        (user.publicMetadata.role !== "supervisor" &&
+          user.publicMetadata.role !== "admin")
+      ) {
+        throw new Error("You are not authorized to perform this action");
+      }
+      await ctx.db
+        .update(disbursementRequests)
+        .set({
+          status: input.status,
+        })
+        .where(eq(disbursementRequests.id, input.id));
+    }),
 });
