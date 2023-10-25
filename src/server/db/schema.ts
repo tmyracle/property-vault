@@ -14,6 +14,7 @@ import {
   json,
   boolean,
 } from "drizzle-orm/mysql-core";
+const { v4: uuidv4 } = require("uuid");
 
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
@@ -49,6 +50,7 @@ export const cases = mysqlTable("case", {
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   description: text("description"),
   caseDate: timestamp("case_date"),
+  slug: varchar("slug", { length: 256 }).notNull(),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
 
@@ -130,6 +132,7 @@ export const disbursementRequests = mysqlTable("disbursement_request", {
   ]).notNull(),
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).notNull(),
   amount: decimal("amount", { precision: 19, scale: 4 }).notNull(),
+  slug: varchar("slug", { length: 256 }).notNull(),
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });

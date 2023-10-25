@@ -1,19 +1,50 @@
 "use client";
 
 import { type ColumnDef } from "@tanstack/react-table";
-import { type Case, type Deposit } from "~/server/db/schema";
+import {
+  type Case,
+  type Deposit,
+  type DisbursementRequest,
+} from "~/server/db/schema";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import { DataTableRowActions } from "./data-table-row-actions";
 import { type Row } from "@tanstack/react-table";
 
 interface ExtendedCase extends Case {
   deposits: Deposit[];
+  disbursementRequests: DisbursementRequest[];
 }
 
-const calculateDeposits = (row: Row<ExtendedCase>) => {
-  return row.original.deposits.reduce((acc, deposit) => {
-    return acc + Number(deposit.amount);
-  }, 0);
+const calculateDeposits = (row: Row<ExtendedCase> | ExtendedCase) => {
+  if ("original" in row) {
+    return row.original.deposits.reduce((acc, deposit) => {
+      return acc + Number(deposit.amount);
+    }, 0);
+  } else {
+    return row.deposits.reduce((acc, deposit) => {
+      return acc + Number(deposit.amount);
+    }, 0);
+  }
+};
+
+const calculateDisbursements = (row: Row<ExtendedCase> | ExtendedCase) => {
+  if ("original" in row) {
+    return row.original.disbursementRequests.reduce((acc, disbursement) => {
+      if (disbursement.status === "approved") {
+        return acc + Number(disbursement.amount);
+      } else {
+        return acc;
+      }
+    }, 0);
+  } else {
+    return row.disbursementRequests.reduce((acc, disbursement) => {
+      if (disbursement.status === "approved") {
+        return acc + Number(disbursement.amount);
+      } else {
+        return acc;
+      }
+    }, 0);
+  }
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -29,6 +60,7 @@ export const columns: ColumnDef<ExtendedCase, any>[] = [
   },
   {
     accessorKey: "caseDate",
+    accessorFn: (row) => row.caseDate?.toLocaleDateString(),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Date" />
     ),
@@ -53,6 +85,7 @@ export const columns: ColumnDef<ExtendedCase, any>[] = [
   },
   {
     accessorKey: "deposits",
+    accessorFn: (row) => calculateDeposits(row),
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Deposits" />
     ),
@@ -63,6 +96,24 @@ export const columns: ColumnDef<ExtendedCase, any>[] = [
           style: "currency",
           currency: "USD",
         }).format(calculateDeposits(row))}
+      </div>
+    ),
+    enableSorting: true,
+    enableHiding: true,
+  },
+  {
+    accessorKey: "disbursements",
+    accessorFn: (row) => calculateDisbursements(row),
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Disbursements" />
+    ),
+    cell: ({ row }) => (
+      <div>
+        {" "}
+        {new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        }).format(calculateDisbursements(row))}
       </div>
     ),
     enableSorting: true,

@@ -9,8 +9,6 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from "~/app/_components/ui/dropdown-menu";
 import { useState } from "react";
@@ -121,12 +119,6 @@ export function DataTableRowActions<TData extends Case>({
               Edit
             </DropdownMenuItem>
           </DialogTrigger>
-          <DropdownMenuItem>Make a copy</DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => console.log(caseRow.id)}>
-            Delete
-            <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
-          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
       <DialogContent>

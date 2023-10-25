@@ -1,3 +1,4 @@
+"use client";
 import {
   type DisbursementRequest,
   type PropertyOwner,
@@ -10,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
 } from "~/app/_components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 interface DisbursementRequestExtended extends DisbursementRequest {
   propertyOwner: PropertyOwner;
@@ -20,6 +22,7 @@ export function DisbursementList({
 }: {
   disbursementRequests: DisbursementRequestExtended[];
 }) {
+  const router = useRouter();
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-9 items-center justify-start gap-2 text-sm font-medium">
@@ -72,7 +75,13 @@ export function DisbursementList({
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-[160px]">
-                <DropdownMenuItem>Approval Detail</DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={() =>
+                    router.push(`/disbursements?id=${disbursementRequest.slug}`)
+                  }
+                >
+                  Approval Detail
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

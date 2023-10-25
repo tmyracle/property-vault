@@ -15,7 +15,7 @@ import { Separator } from "~/app/_components/ui/separator";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { api } from "~/trpc/react";
 import { useToast } from "~/app/_components/ui/use-toast";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface DisbursementCardProps {
   disbursement: ExtendedDisbursementRequest;
@@ -30,6 +30,7 @@ export function DisbursementCard({
   const { user } = useUser();
   const { toast } = useToast();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const updateRequest = api.disbursementRequest.updateRequest.useMutation({
     onSuccess: (data) => {
       toast({
@@ -47,6 +48,13 @@ export function DisbursementCard({
     });
   }
 
+  function closeRequestCard() {
+    const params = new URLSearchParams(searchParams);
+    params.delete("id");
+    router.push("/disbursements");
+    setSelectedDisbursementRequest(null);
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -56,7 +64,7 @@ export function DisbursementCard({
               Disbursement request for case {disbursement.case.caseNumber}
             </div>
             <div
-              onClick={() => setSelectedDisbursementRequest(null)}
+              onClick={() => closeRequestCard()}
               className="-mr-2 -mt-2 cursor-pointer rounded p-2 hover:bg-gray-100"
             >
               <Cross1Icon />

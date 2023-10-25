@@ -19,7 +19,8 @@ interface ExtendedDisbursementRequest extends DisbursementRequest {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const columns: ColumnDef<ExtendedDisbursementRequest, any>[] = [
   {
-    accessorKey: "caseNumber",
+    accessorKey: "Case Number",
+    accessorFn: (row) => row.case.caseNumber,
     header: ({ column }) => (
       <DisbursementsTableColumnHeader column={column} title="Case" />
     ),
@@ -35,6 +36,7 @@ export const columns: ColumnDef<ExtendedDisbursementRequest, any>[] = [
   },
   {
     accessorKey: "date",
+    accessorFn: (row) => row.createdAt.toLocaleDateString(),
     header: ({ column }) => (
       <DisbursementsTableColumnHeader column={column} title="Date" />
     ),
@@ -66,7 +68,9 @@ export const columns: ColumnDef<ExtendedDisbursementRequest, any>[] = [
     enableHiding: true,
   },
   {
-    accessorKey: "disburseTo",
+    accessorKey: "Disburse To",
+    accessorFn: (row) =>
+      row.distributeTo === "property_owner" ? "Owner" : "Forfeit",
     header: ({ column }) => (
       <DisbursementsTableColumnHeader column={column} title="Disburse To" />
     ),
@@ -83,7 +87,7 @@ export const columns: ColumnDef<ExtendedDisbursementRequest, any>[] = [
     },
   },
   {
-    accessorKey: "requester",
+    accessorKey: "Requested By",
     header: ({ column }) => (
       <DisbursementsTableColumnHeader column={column} title="Requested By" />
     ),

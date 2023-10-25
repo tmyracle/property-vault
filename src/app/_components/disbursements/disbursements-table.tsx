@@ -31,12 +31,15 @@ import {
 
 import { DisbursementsTablePagination } from "./disbursements-table-pagination";
 import { DisbursementsTableToolbar } from "./disbursements-table-toolbar";
+import { type ExtendedDisbursementRequest } from "../disbursement-container";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 interface DisbursementsTableProps<TData, TValue> {
   columns: (ColumnDef<TData, TValue> & { accessorFn?: unknown })[];
   data: TData[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setSelectedDisbursementRequest: (value: any) => void;
+  selectedDisbursementRequest: ExtendedDisbursementRequest | null;
 }
 
 declare module "@tanstack/table-core" {
@@ -69,7 +72,7 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 export function DisbursementsTable<TData, TValue>({
   columns,
   data,
-  setSelectedDisbursementRequest,
+  selectedDisbursementRequest,
 }: DisbursementsTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -79,6 +82,9 @@ export function DisbursementsTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const table = useReactTable({
     data,
@@ -108,9 +114,26 @@ export function DisbursementsTable<TData, TValue>({
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
 
+  const createQueryString = React.useCallback(
+    (name: string, value: string) => {
+      const params = new URLSearchParams(searchParams);
+      params.set(name, value);
+
+      return params.toString();
+    },
+    [searchParams],
+  );
+
   const handleNavigation = (cell: Cell<TData, TValue>, row: Row<TData>) => {
     if (cell.column.columnDef.id !== "actions") {
-      setSelectedDisbursementRequest(row.original);
+      router.push(
+        pathname +
+          "?" +
+          createQueryString(
+            "id",
+            (row.original as ExtendedDisbursementRequest).slug.toString(),
+          ),
+      );
     }
   };
 
@@ -146,6 +169,13 @@ export function DisbursementsTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
+                  className={
+                    selectedDisbursementRequest &&
+                    (row.original as ExtendedDisbursementRequest).id ===
+                      selectedDisbursementRequest.id
+                      ? "bg-gray-100"
+                      : ""
+                  }
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (

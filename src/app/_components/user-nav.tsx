@@ -45,11 +45,9 @@ export function UserNav() {
         <DropdownMenuGroup>
           <DropdownMenuItem onSelect={() => router.push("/settings/account")}>
             Profile
-            <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
           </DropdownMenuItem>
           <DropdownMenuItem onSelect={() => router.push("/settings")}>
             Settings
-            <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

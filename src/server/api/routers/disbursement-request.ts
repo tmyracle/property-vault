@@ -3,9 +3,10 @@ import { z } from "zod";
 import { eq } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { disbursementRequests } from "~/server/db/schema";
+import { disbursementRequests, cases } from "~/server/db/schema";
 import { clerkClient } from "@clerk/nextjs";
 import { type OrganizationMembership } from "@clerk/nextjs/dist/types/server";
+const { v4: uuidv4 } = require("uuid");
 
 export const disbursementRequestRouter = createTRPCRouter({
   create: protectedProcedure
@@ -20,6 +21,47 @@ export const disbursementRequestRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      const matchCase = await ctx.db.query.cases.findFirst({
+        where: eq(cases.id, input.caseId),
+        with: {
+          deposits: true,
+          disbursementRequests: true,
+        },
+      });
+
+      const totalDisbursmentsForOwner = matchCase?.disbursementRequests.reduce(
+        (total: number, disbursement) => {
+          if (disbursement.propertyOwnerId === input.propertyOwnerId) {
+            return total + Number(disbursement.amount);
+          } else {
+            return total;
+          }
+        },
+        0,
+      );
+
+      const totalDepositsForOwner = matchCase?.deposits.reduce(
+        (total: number, deposit) => {
+          if (deposit.propertyOwnerId === input.propertyOwnerId) {
+            return total + Number(deposit.amount);
+          } else {
+            return total;
+          }
+        },
+        0,
+      );
+
+      if (totalDisbursmentsForOwner && totalDepositsForOwner) {
+        const totalDisbursmentsForOwnerAndRequest =
+          totalDisbursmentsForOwner + Number(input.amount);
+
+        if (totalDisbursmentsForOwnerAndRequest > totalDepositsForOwner) {
+          throw new Error(
+            "The total amount of disbursements for this owner cannot exceed the total amount of deposits",
+          );
+        }
+      }
+
       await ctx.db.insert(disbursementRequests).values({
         caseId: input.caseId,
         propertyOwnerId: input.propertyOwnerId,
@@ -27,6 +69,7 @@ export const disbursementRequestRouter = createTRPCRouter({
         description: input.description,
         distributeTo: input.distributeTo,
         status: input.status,
+        slug: uuidv4(),
         createdBy: ctx.auth.userId,
         orgId: ctx.auth.orgId!,
       });

@@ -1,6 +1,7 @@
 import { TRPCError } from "@trpc/server";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
+const { v4: uuidv4 } = require("uuid");
 
 import {
   createTRPCRouter,
@@ -15,13 +16,14 @@ export const caseRouter = createTRPCRouter({
       where: eq(cases.orgId, ctx.auth.orgId!),
       with: {
         deposits: true,
+        disbursementRequests: true,
       },
     });
   }),
 
-  getCase: publicProcedure.input(z.number()).query(async ({ ctx, input }) => {
+  getCase: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const result = await ctx.db.query.cases.findFirst({
-      where: eq(cases.id, input),
+      where: eq(cases.slug, input),
       with: {
         deposits: {
           with: {
@@ -61,6 +63,7 @@ export const caseRouter = createTRPCRouter({
         caseNumber: input.caseNumber,
         description: input.description,
         caseDate: input.caseDate,
+        slug: uuidv4(),
         createdBy: ctx.auth.userId,
         orgId: ctx.auth.orgId!,
       });

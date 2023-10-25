@@ -42,9 +42,9 @@ export function DisbursementsTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
-        {table.getColumn("caseNumber") && (
+        {table.getColumn("Case Number") && (
           <DisbursementsTableFacetedFilter
-            column={table.getColumn("caseNumber")}
+            column={table.getColumn("Case Number")}
             title="Case"
             options={caseNumbers}
           />

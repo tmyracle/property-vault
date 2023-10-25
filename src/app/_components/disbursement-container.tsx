@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DisbursementsTable } from "~/app/_components/disbursements/disbursements-table";
 import { columns } from "~/app/_components/disbursements/columns";
 
@@ -11,6 +11,7 @@ import {
 } from "~/server/db/schema";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { DisbursementCard } from "./disbursement-card";
+import { useSearchParams } from "next/navigation";
 
 export interface ExtendedDisbursementRequest extends DisbursementRequest {
   case: Case;
@@ -30,6 +31,18 @@ export function DisbursementContainer({
   const [selectedDisbursement, setSelectedDisbursementRequest] =
     useState<ExtendedDisbursementRequest | null>(null);
   const [parent] = useAutoAnimate();
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    const disbursementId = searchParams.get("id");
+    if (disbursementId) {
+      const selected = disbursementRequests.find(
+        (disbursement) => disbursement.slug === disbursementId,
+      );
+      setSelectedDisbursementRequest(selected ?? null);
+    }
+  }, [disbursementRequests, searchParams]);
+
   return (
     <div ref={parent} className="grid grid-cols-8 gap-4">
       <div
@@ -40,6 +53,7 @@ export function DisbursementContainer({
         <DisbursementsTable
           columns={columns}
           data={disbursementRequests}
+          selectedDisbursementRequest={selectedDisbursement}
           setSelectedDisbursementRequest={setSelectedDisbursementRequest}
         />
       </div>

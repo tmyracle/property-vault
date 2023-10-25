@@ -81,6 +81,15 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
         router.refresh();
         setOpen(false);
       },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+        });
+        form.setError("amount", {
+          message: error.message,
+        });
+      },
     });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -90,14 +99,14 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
       description: "",
       distributeTo: "property_owner",
       status: "pending",
-      amount: deposit?.amount,
+      amount: deposit?.amount.toString() ?? "",
     },
   });
 
   function updateFormValues(deposit: DepositExtended) {
     form.setValue("caseId", deposit.caseId);
     form.setValue("propertyOwnerId", deposit.propertyOwner.id);
-    form.setValue("amount", deposit.amount);
+    form.setValue("amount", deposit.amount.toString());
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {

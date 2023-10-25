@@ -11,10 +11,9 @@ import {
 } from "~/app/_components/ui/card";
 import { api } from "~/trpc/server";
 
-export default async function Page({ params }: { params: { id: string } }) {
+export default async function Page({ params }: { params: { slug: string } }) {
   const { userId } = auth();
-  const caseId = Number(params.id);
-  const caseForPage = await api.case.getCase.query(caseId);
+  const caseForPage = await api.case.getCase.query(params.slug);
 
   if (!userId || !caseForPage) return null;
 
@@ -67,14 +66,22 @@ export default async function Page({ params }: { params: { id: string } }) {
     <SignedIn>
       <div className="p-10">
         <div className="hidden h-full flex-1 flex-col space-y-8 p-8 md:flex">
-          <div className="flex items-center justify-between space-y-2">
+          <div className="flex items-start justify-between space-y-2">
             <div>
               <h2 className="text-2xl font-bold tracking-tight">
                 Case # {caseForPage.caseNumber}
               </h2>
+              <p className="text-sm text-muted-foreground">
+                {caseForPage.name}
+              </p>
+              {caseForPage.description && (
+                <p className="text-sm text-muted-foreground">
+                  {caseForPage.description}
+                </p>
+              )}
             </div>
             <div className="space-x-4">
-              <AddDepositDialog caseId={caseId} />
+              <AddDepositDialog caseId={caseForPage.id} />
             </div>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

@@ -110,7 +110,7 @@ export function DataTable<TData, TValue>({
 
   const handleNavigation = (cell: Cell<TData, TValue>, row: Row<TData>) => {
     if (cell.column.columnDef.id !== "actions") {
-      router.push(`/cases/${(row.original as { id: number }).id}`);
+      router.push(`/cases/${(row.original as { slug: string }).slug}`);
     }
   };
 
