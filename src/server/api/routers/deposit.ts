@@ -1,5 +1,6 @@
 //import { eq } from "drizzle-orm";
 import { z } from "zod";
+import { eq, desc } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { addresses, deposits, propertyOwners } from "~/server/db/schema";
@@ -56,4 +57,20 @@ export const depositRouter = createTRPCRouter({
         orgId: ctx.auth.orgId!,
       });
     }),
+
+  getRecent: protectedProcedure.query(({ ctx }) => {
+    return ctx.db.query.deposits.findMany({
+      where: eq(deposits.orgId, ctx.auth.orgId!),
+      orderBy: [desc(deposits.createdAt)],
+      limit: 10,
+      with: {
+        propertyOwner: {
+          with: {
+            addresses: true,
+          },
+        },
+        case: true,
+      },
+    });
+  }),
 });

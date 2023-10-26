@@ -2,7 +2,7 @@ import { type Metadata } from "next";
 import Image from "next/image";
 
 import { Separator } from "~/app/_components/ui/separator";
-import { SidebarNav } from "~/app/_components/sidebar-nav";
+import { SidebarNav } from "~/app/_components/settings/sidebar-nav";
 
 export const metadata: Metadata = {
   title: "Forms",
@@ -51,7 +51,7 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
         <div className="space-y-0.5">
           <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
           <p className="text-muted-foreground">
-            Manage your team and account settings.
+            Manage your team and account settings
           </p>
         </div>
         <Separator className="my-6" />

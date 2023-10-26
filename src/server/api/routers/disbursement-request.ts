@@ -1,12 +1,12 @@
 //import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { disbursementRequests, cases } from "~/server/db/schema";
 import { clerkClient } from "@clerk/nextjs";
 import { type OrganizationMembership } from "@clerk/nextjs/dist/types/server";
-const { v4: uuidv4 } = require("uuid");
+import { v4 as uuidv4 } from "uuid";
 
 export const disbursementRequestRouter = createTRPCRouter({
   create: protectedProcedure
@@ -165,5 +165,18 @@ export const disbursementRequestRouter = createTRPCRouter({
       .filter((value, index, self) => self.indexOf(value) === index);
 
     return uniqueCaseNumbers;
+  }),
+
+  getPending: protectedProcedure.query(async ({ ctx }) => {
+    return await ctx.db.query.disbursementRequests.findMany({
+      where: and(
+        eq(disbursementRequests.orgId, ctx.auth.orgId!),
+        eq(disbursementRequests.status, "pending"),
+      ),
+      with: {
+        propertyOwner: true,
+        case: true,
+      },
+    });
   }),
 });

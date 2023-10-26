@@ -19,7 +19,7 @@ export default async function Disbursements() {
                 Disbursements
               </h2>
               <p className="text-muted-foreground">
-                Disbursements and request approvals.
+                Disbursements and request approvals
               </p>
             </div>
             <div></div>

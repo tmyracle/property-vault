@@ -12,6 +12,7 @@ interface PhoneNumberInputProps extends Omit<InputProps, "onChange"> {
 }
 
 export const PhoneInput: React.FC<PhoneNumberInputProps> = ({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   value,
   onChange,
   ...props

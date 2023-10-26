@@ -4,6 +4,7 @@ import { caseRouter } from "./routers/case";
 import { depositRouter } from "./routers/deposit";
 import { disbursementRequestRouter } from "./routers/disbursement-request";
 import { userRouter } from "./routers/user";
+import { dashboardRouter } from "./routers/dashboard";
 
 /**
  * This is the primary router for your server.
@@ -16,6 +17,7 @@ export const appRouter = createTRPCRouter({
   case: caseRouter,
   deposit: depositRouter,
   disbursementRequest: disbursementRequestRouter,
+  dashboard: dashboardRouter,
 });
 
 // export type definition of API

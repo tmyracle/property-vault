@@ -6,7 +6,7 @@ import cn from "classnames";
 
 import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCReactProvider } from "~/trpc/react";
-import { Navbar } from "~/app/_components/navbar";
+import { Navbar } from "~/app/_components/nav/navbar";
 import { Toaster } from "~/app/_components/ui/toaster";
 
 export const fontSans = Inter({
