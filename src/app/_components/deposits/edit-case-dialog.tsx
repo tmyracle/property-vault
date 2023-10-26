@@ -34,8 +34,10 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
+import { type Case } from "~/server/db/schema";
 
 const formSchema = z.object({
+  id: z.number(),
   name: z.string().min(1, {
     message: "Name is required",
   }),
@@ -46,44 +48,76 @@ const formSchema = z.object({
   caseDate: z.date(),
 });
 
-export function AddCaseDialog() {
+interface EditCaseDialogProps {
+  case: Case;
+}
+
+export function EditCaseDialog({ case: caseProp }: EditCaseDialogProps) {
   const [open, setOpen] = useState(false);
   const router = useRouter();
-  const addCaseMutation = api.case.create.useMutation({
-    onSuccess: (data) => {
+  const updateCaseMutation = api.case.update.useMutation({
+    onSuccess: () => {
       form.reset();
-      router.push(`/cases/${data?.slug}`);
+      router.refresh();
       setOpen(false);
     },
   });
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
-      caseNumber: "",
-      description: "",
-      caseDate: new Date(),
+      id: caseProp.id ?? null,
+      name: caseProp.name ?? "",
+      caseNumber: caseProp.caseNumber ?? "",
+      description: caseProp.description ?? "",
+      caseDate: caseProp.caseDate ?? new Date(),
     },
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    addCaseMutation.mutate(values);
+    updateCaseMutation.mutate(values);
   }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>Add Case</Button>
+        <div className="w-full">Edit</div>
       </DialogTrigger>
+
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add case</DialogTitle>
+          <DialogTitle>Edit case</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form
             className="grid gap-4 py-2"
             onSubmit={form.handleSubmit(onSubmit)}
           >
+            <FormField
+              name="id"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input type="hidden" {...field} />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="name"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Case name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Case name" {...field} />
+                  </FormControl>
+                  <FormDescription>A short name for the case.</FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               name="caseNumber"
               control={form.control}
@@ -93,21 +127,6 @@ export function AddCaseDialog() {
                   <FormControl>
                     <Input {...field} placeholder="Case number" />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="name"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Case name</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Case name" />
-                  </FormControl>
-                  <FormDescription>A short name for the case.</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

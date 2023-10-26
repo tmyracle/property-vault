@@ -49,7 +49,7 @@ export const cases = mysqlTable("case", {
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   description: text("description"),
   caseDate: timestamp("case_date"),
-  slug: varchar("slug", { length: 256 }).notNull(),
+  slug: varchar("slug", { length: 256 }),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
 
@@ -99,6 +99,7 @@ export const deposits = mysqlTable("deposit", {
   itemNumber: varchar("item_number", { length: 256 }),
   amount: decimal("amount", { precision: 19, scale: 4 }).notNull(),
   description: text("description"),
+  slug: varchar("slug", { length: 256 }),
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
@@ -131,7 +132,7 @@ export const disbursementRequests = mysqlTable("disbursement_request", {
   ]).notNull(),
   status: mysqlEnum("status", ["pending", "approved", "rejected"]).notNull(),
   amount: decimal("amount", { precision: 19, scale: 4 }).notNull(),
-  slug: varchar("slug", { length: 256 }).notNull(),
+  slug: varchar("slug", { length: 256 }),
   createdBy: varchar("created_by", { length: 256 }).notNull(),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });

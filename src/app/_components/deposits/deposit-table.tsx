@@ -29,17 +29,16 @@ import {
   TableRow,
 } from "~/app/_components/ui/table";
 
-import { DisbursementsTablePagination } from "./disbursements-table-pagination";
-import { DisbursementsTableToolbar } from "./disbursements-table-toolbar";
-import { type ExtendedDisbursementRequest } from "../disbursement-container";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { DepositTablePagination } from "./deposit-table-pagination";
+import { DepositTableToolbar } from "./deposit-table-toolbar";
 
-interface DisbursementsTableProps<TData, TValue> {
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { type ExtendedDeposit } from "./columns";
+
+interface DepositTableProps<TData, TValue> {
   columns: (ColumnDef<TData, TValue> & { accessorFn?: unknown })[];
   data: TData[];
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setSelectedDisbursementRequest: (value: any) => void;
-  selectedDisbursementRequest: ExtendedDisbursementRequest | null;
+  selectedDeposit: ExtendedDeposit | null;
 }
 
 declare module "@tanstack/table-core" {
@@ -69,11 +68,11 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed;
 };
 
-export function DisbursementsTable<TData, TValue>({
+export function DepositTable<TData, TValue>({
   columns,
   data,
-  selectedDisbursementRequest,
-}: DisbursementsTableProps<TData, TValue>) {
+  selectedDeposit,
+}: DepositTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
@@ -131,7 +130,7 @@ export function DisbursementsTable<TData, TValue>({
           "?" +
           createQueryString(
             "id",
-            (row.original as ExtendedDisbursementRequest).slug!.toString(),
+            (row.original as ExtendedDeposit).slug!.toString(),
           ),
       );
     }
@@ -139,7 +138,7 @@ export function DisbursementsTable<TData, TValue>({
 
   return (
     <div className="space-y-4">
-      <DisbursementsTableToolbar
+      <DepositTableToolbar
         table={table}
         globalFilter={globalFilter}
         setGlobalFilter={setGlobalFilter}
@@ -170,9 +169,8 @@ export function DisbursementsTable<TData, TValue>({
                 <TableRow
                   key={row.id}
                   className={
-                    selectedDisbursementRequest &&
-                    (row.original as ExtendedDisbursementRequest).id ===
-                      selectedDisbursementRequest.id
+                    selectedDeposit &&
+                    (row.original as ExtendedDeposit).id === selectedDeposit.id
                       ? "bg-gray-100"
                       : ""
                   }
@@ -209,7 +207,7 @@ export function DisbursementsTable<TData, TValue>({
           </TableBody>
         </Table>
       </div>
-      <DisbursementsTablePagination table={table} />
+      <DepositTablePagination table={table} />
     </div>
   );
 }

@@ -4,8 +4,23 @@ import { eq, desc } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { addresses, deposits, propertyOwners } from "~/server/db/schema";
+import { v4 as uuidv4 } from "uuid";
 
 export const depositRouter = createTRPCRouter({
+  getAllDeposits: protectedProcedure.query(({ ctx }) => {
+    return ctx.db.query.deposits.findMany({
+      where: eq(deposits.orgId, ctx.auth.orgId!),
+      with: {
+        propertyOwner: {
+          with: {
+            addresses: true,
+          },
+        },
+        case: true,
+      },
+    });
+  }),
+
   create: protectedProcedure
     .input(
       z.object({
@@ -53,6 +68,7 @@ export const depositRouter = createTRPCRouter({
         amount: input.amount.toString(),
         itemNumber: input.itemNumber,
         description: input.description,
+        slug: uuidv4(),
         createdBy: ctx.auth.userId,
         orgId: ctx.auth.orgId!,
       });
@@ -73,4 +89,24 @@ export const depositRouter = createTRPCRouter({
       },
     });
   }),
+
+  update: protectedProcedure
+    .input(
+      z.object({
+        id: z.number(),
+        amount: z.string(),
+        itemNumber: z.string().nullable(),
+        description: z.string().nullable(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db
+        .update(deposits)
+        .set({
+          amount: input.amount,
+          itemNumber: input.itemNumber,
+          description: input.description,
+        })
+        .where(eq(deposits.id, input.id));
+    }),
 });

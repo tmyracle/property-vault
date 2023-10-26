@@ -1,5 +1,5 @@
 import { TRPCError } from "@trpc/server";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
 
@@ -58,7 +58,7 @@ export const caseRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      await ctx.db.insert(cases).values({
+      const createdCase = await ctx.db.insert(cases).values({
         name: input.name,
         caseNumber: input.caseNumber,
         description: input.description,
@@ -66,6 +66,13 @@ export const caseRouter = createTRPCRouter({
         slug: uuidv4(),
         createdBy: ctx.auth.userId,
         orgId: ctx.auth.orgId!,
+      });
+
+      return ctx.db.query.cases.findFirst({
+        where: and(
+          eq(cases.id, Number(createdCase.insertId)),
+          eq(cases.orgId, ctx.auth.orgId!),
+        ),
       });
     }),
 
