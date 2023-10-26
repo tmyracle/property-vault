@@ -69,6 +69,10 @@ export const columns: ColumnDef<ExtendedDeposit, any>[] = [
     cell: ({ row }) => (
       <div className="">{row.original.propertyOwner.name}</div>
     ),
+    filterFn: (row, id, value) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+      return value.includes(row.original.propertyOwner.name);
+    },
     enableSorting: true,
     enableHiding: false,
   },
