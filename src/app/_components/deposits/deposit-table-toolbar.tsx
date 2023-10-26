@@ -8,7 +8,8 @@ import { Input } from "~/app/_components/ui/input";
 import { DepositTableViewOptions } from "./deposit-table-view-options";
 
 //import { priorities, statuses } from "./data/data";
-//import { DataTableFacetedFilter } from "./data-table-faceted-filter";
+import { DepositTableFacetedFilter } from "./deposit-table-faceted-filter";
+import { api } from "~/trpc/react";
 
 interface DepositTableToolbarProps<TData> {
   table: Table<TData>;
@@ -22,6 +23,19 @@ export function DepositTableToolbar<TData>({
   setGlobalFilter,
 }: DepositTableToolbarProps<TData>) {
   const isFiltered = table.getState().columnFilters.length > 0;
+  const filterData = api.deposit.getFilterData.useQuery();
+
+  const caseNumbers =
+    filterData.data?.caseNumbers?.map((caseNumber: string) => ({
+      value: caseNumber,
+      label: caseNumber,
+    })) ?? [];
+
+  const owners =
+    filterData.data?.propertyOwners?.map((owner: string) => ({
+      value: owner,
+      label: owner,
+    })) ?? [];
 
   return (
     <div className="flex items-center justify-between">
@@ -34,6 +48,20 @@ export function DepositTableToolbar<TData>({
           }
           className="h-8 w-[150px] lg:w-[250px]"
         />
+        {table.getColumn("Case Number") && (
+          <DepositTableFacetedFilter
+            column={table.getColumn("Case Number")}
+            title="Case"
+            options={caseNumbers}
+          />
+        )}
+        {table.getColumn("owner") && (
+          <DepositTableFacetedFilter
+            column={table.getColumn("owner")}
+            title="Owner"
+            options={owners}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"

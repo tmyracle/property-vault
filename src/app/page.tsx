@@ -7,10 +7,10 @@ import {
   CardTitle,
   CardDescription,
 } from "~/app/_components/ui/card";
-import { Button } from "~/app/_components/ui/button";
 import { api } from "~/trpc/server";
 import { RecentDepositList } from "~/app/_components/dashboard/recent-deposits";
 import { DisbursementList } from "~/app/_components/disbursement-list";
+import { AddDepositDialog } from "./_components/add-deposit-dialog";
 
 export default async function Home() {
   const { userId } = auth();
@@ -39,9 +39,7 @@ export default async function Home() {
                 </p>
               </div>
               <div className="space-x-4">
-                {/*
-                <Button>Action here</Button>
-                */}
+                <AddDepositDialog caseId={null} />
               </div>
             </div>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-5">

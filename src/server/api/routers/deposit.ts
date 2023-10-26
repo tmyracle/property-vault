@@ -109,4 +109,27 @@ export const depositRouter = createTRPCRouter({
         })
         .where(eq(deposits.id, input.id));
     }),
+
+  getFilterData: protectedProcedure.query(async ({ ctx }) => {
+    const depositResults = await ctx.db.query.deposits.findMany({
+      where: eq(deposits.orgId, ctx.auth.orgId!),
+      with: {
+        case: true,
+        propertyOwner: true,
+      },
+    });
+
+    const uniquePropertyOwners = depositResults
+      .map((request) => request.propertyOwner.name)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    const uniqueCaseNumbers = depositResults
+      .map((request) => request.case.caseNumber)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    return {
+      caseNumbers: uniqueCaseNumbers,
+      propertyOwners: uniquePropertyOwners,
+    };
+  }),
 });
