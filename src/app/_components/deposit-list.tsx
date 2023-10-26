@@ -4,6 +4,7 @@ import {
   type Deposit,
   type PropertyOwner,
   type Address,
+  type Case,
 } from "~/server/db/schema";
 import { Button } from "~/app/_components/ui/button";
 import { DotsHorizontalIcon } from "@radix-ui/react-icons";
@@ -52,8 +53,20 @@ interface PropertyOwnerExtended extends PropertyOwner {
   addresses: Address[];
 }
 
+interface ExtendedCase extends Case {
+  disbursementRequests: {
+    id: number;
+    amount: string;
+    propertyOwner: {
+      id: number;
+      name: string;
+    };
+  }[];
+}
+
 interface DepositExtended extends Deposit {
   propertyOwner: PropertyOwnerExtended;
+  case: ExtendedCase;
 }
 
 const formSchema = z.object({
@@ -103,10 +116,22 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
     },
   });
 
+  function remainingBalance(deposit: DepositExtended) {
+    let total = Number(deposit.amount);
+    deposit.case.disbursementRequests.forEach((disbursementRequest) => {
+      if (
+        disbursementRequest.propertyOwner.name === deposit.propertyOwner.name
+      ) {
+        total -= Number(disbursementRequest.amount);
+      }
+    });
+    return total;
+  }
+
   function updateFormValues(deposit: DepositExtended) {
     form.setValue("caseId", deposit.caseId);
     form.setValue("propertyOwnerId", deposit.propertyOwner.id);
-    form.setValue("amount", deposit.amount.toString());
+    form.setValue("amount", remainingBalance(deposit).toString());
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -153,13 +178,15 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
             <Dialog open={open} onOpenChange={setOpen}>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
-                  >
-                    <DotsHorizontalIcon className="h-4 w-4" />
-                    <span className="sr-only">Open menu</span>
-                  </Button>
+                  {remainingBalance(deposit) > 0 ? (
+                    <Button
+                      variant="ghost"
+                      className="flex h-8 w-8 p-0 data-[state=open]:bg-muted"
+                    >
+                      <DotsHorizontalIcon className="h-4 w-4" />
+                      <span className="sr-only">Open menu</span>
+                    </Button>
+                  ) : null}
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="">
                   <DialogTrigger asChild>

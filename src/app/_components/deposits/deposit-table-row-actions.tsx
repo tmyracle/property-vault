@@ -108,7 +108,7 @@ export function DepositTableRowActions<TData extends ExtendedDeposit>({
       </DropdownMenu>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit case</DialogTitle>
+          <DialogTitle>Edit deposit</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form

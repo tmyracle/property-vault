@@ -48,6 +48,24 @@ export const caseRouter = createTRPCRouter({
                 addresses: true,
               },
             },
+            case: {
+              with: {
+                disbursementRequests: {
+                  columns: {
+                    id: true,
+                    amount: true,
+                  },
+                  with: {
+                    propertyOwner: {
+                      columns: {
+                        id: true,
+                        name: true,
+                      },
+                    },
+                  },
+                },
+              },
+            },
           },
         },
         disbursementRequests: {
