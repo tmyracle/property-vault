@@ -85,6 +85,20 @@ export function AddCaseDialog() {
             onSubmit={form.handleSubmit(onSubmit)}
           >
             <FormField
+              name="caseNumber"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Case number</FormLabel>
+                  <FormControl>
+                    <Input {...field} placeholder="Case number" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
               name="name"
               control={form.control}
               render={({ field }) => (
@@ -94,20 +108,6 @@ export function AddCaseDialog() {
                     <Input {...field} placeholder="Case name" />
                   </FormControl>
                   <FormDescription>A short name for the case.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              name="caseNumber"
-              control={form.control}
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Case number</FormLabel>
-                  <FormControl>
-                    <Input {...field} placeholder="Case number" />
-                  </FormControl>
                   <FormMessage />
                 </FormItem>
               )}

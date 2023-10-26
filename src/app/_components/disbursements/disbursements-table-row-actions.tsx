@@ -24,7 +24,7 @@ interface DisbursementsTableRowActionsProps<TData> {
 export function DisbursementsTableRowActions<
   TData extends DisbursementRequest,
 >({ row }: DisbursementsTableRowActionsProps<TData>) {
-  const caseRow = disbursementRequestSchema.parse(row.original);
+  const disbursementRow = disbursementRequestSchema.parse(row.original);
   //const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -39,11 +39,8 @@ export function DisbursementsTableRowActions<
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Make a copy</DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => console.log(caseRow.id)}>
+        <DropdownMenuItem onClick={() => console.log(disbursementRow.id)}>
           Delete
-          <DropdownMenuShortcut>⌘⌫</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

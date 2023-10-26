@@ -26,6 +26,7 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
+import { PhoneInput } from "~/app/_components/ui/phone-input";
 
 const formSchema = z.object({
   caseId: z.number(),
@@ -164,7 +165,7 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
               name="propertyOwner.name"
               control={form.control}
               render={({ field }) => (
-                <FormItem className="col-span-2">
+                <FormItem className="col-span-4">
                   <FormLabel>Property owner name</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Name" />
@@ -178,10 +179,10 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
               name="propertyOwner.phone"
               control={form.control}
               render={({ field }) => (
-                <FormItem className="col-span-2">
+                <FormItem className="col-span-4">
                   <FormLabel>Property owner phone</FormLabel>
                   <FormControl>
-                    <Input {...field} placeholder="Phone" />
+                    <PhoneInput {...field} placeholder="Phone" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

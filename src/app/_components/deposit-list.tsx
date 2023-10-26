@@ -221,7 +221,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                       control={form.control}
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Distribute to</FormLabel>
+                          <FormLabel>Disburse to</FormLabel>
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={field.value}

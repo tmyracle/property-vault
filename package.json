@@ -41,6 +41,7 @@
     "cmdk": "^0.2.0",
     "date-fns": "^2.30.0",
     "drizzle-orm": "^0.28.5",
+    "libphonenumber-js": "^1.10.48",
     "lucide-react": "^0.288.0",
     "next": "^13.5.4",
     "react": "18.2.0",

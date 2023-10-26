@@ -16,6 +16,7 @@ import { Cross1Icon } from "@radix-ui/react-icons";
 import { api } from "~/trpc/react";
 import { useToast } from "~/app/_components/ui/use-toast";
 import { useRouter, useSearchParams } from "next/navigation";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 interface DisbursementCardProps {
   disbursement: ExtendedDisbursementRequest;
@@ -114,7 +115,10 @@ export function DisbursementCard({
                   {disbursement.propertyOwner.email}
                 </div>
                 <div className="text-sm text-muted-foreground">
-                  {disbursement.propertyOwner.phone}
+                  {parsePhoneNumberFromString(
+                    disbursement.propertyOwner.phone ?? "",
+                    "US",
+                  )?.formatNational()}
                 </div>
                 {disbursement.propertyOwner.addresses?.length > 0 ? (
                   <div className="text-sm">
