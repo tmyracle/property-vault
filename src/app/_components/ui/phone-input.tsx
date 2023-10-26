@@ -6,13 +6,13 @@ import React, { useState, forwardRef, type ChangeEvent } from "react";
 import { Input, type InputProps } from "~/app/_components/ui/input";
 import { parsePhoneNumberFromString, AsYouType } from "libphonenumber-js";
 
-// You might need to adjust the type depending on your use case and the types used in your project.
 interface PhoneNumberInputProps extends Omit<InputProps, "onChange"> {
   value: string;
   onChange: (value: string) => void;
 }
 
 const PhoneInput = forwardRef<HTMLInputElement, PhoneNumberInputProps>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ({ value, onChange, ...props }, ref) => {
     const [displayValue, setDisplayValue] = useState<string>("");
 
