@@ -21,6 +21,22 @@ export const caseRouter = createTRPCRouter({
     });
   }),
 
+  getCaseNumbers: protectedProcedure.query(async ({ ctx }) => {
+    const caseFragments = await ctx.db.query.cases.findMany({
+      where: eq(cases.orgId, ctx.auth.orgId!),
+      columns: {
+        id: true,
+        caseNumber: true,
+      },
+    });
+    return caseFragments.map((fragment) => {
+      return {
+        label: fragment.caseNumber,
+        value: fragment.id.toString(),
+      };
+    });
+  }),
+
   getCase: publicProcedure.input(z.string()).query(async ({ ctx, input }) => {
     const result = await ctx.db.query.cases.findFirst({
       where: eq(cases.slug, input),

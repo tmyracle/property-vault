@@ -21,15 +21,29 @@ import {
   FormLabel,
   FormMessage,
 } from "~/app/_components/ui/form";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "~/app/_components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "~/app/_components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "~/lib/utils";
 import { useToast } from "~/app/_components/ui/use-toast";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
-import { PhoneInput } from "~/app/_components/ui/phone-input";
+import PhoneInput from "~/app/_components/ui/phone-input";
 
 const formSchema = z.object({
-  caseId: z.number(),
+  caseId: z.string(),
   amount: z.string().min(1, {
     message: "Amount is required",
   }),
@@ -61,10 +75,11 @@ const formSchema = z.object({
   }),
 });
 
-export function AddDepositDialog({ caseId }: { caseId: number }) {
+export function AddDepositDialog({ caseId }: { caseId: number | null }) {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const router = useRouter();
+  const { data: cases } = api.case.getCaseNumbers.useQuery();
   const addDepositMutation = api.deposit.create.useMutation({
     onSuccess: () => {
       form.reset();
@@ -79,7 +94,7 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      caseId: caseId,
+      caseId: caseId?.toString() ?? "",
       amount: "0",
       itemNumber: "",
       description: "",
@@ -99,7 +114,10 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    addDepositMutation.mutate(values);
+    addDepositMutation.mutate({
+      ...values,
+      caseId: Number(values.caseId),
+    });
   }
 
   return (
@@ -116,6 +134,68 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
             className="grid gap-4 py-2 sm:grid-cols-2 lg:grid-cols-4"
             onSubmit={form.handleSubmit(onSubmit)}
           >
+            {!caseId && cases ? (
+              <FormField
+                name="caseId"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItem className="col-span-4">
+                    <FormLabel>Case</FormLabel>
+                    <div className="flex items-center space-x-4">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant="outline"
+                              role="combobox"
+                              className={cn(
+                                "w-full justify-between",
+                                !field.value && "text-muted-foreground",
+                              )}
+                            >
+                              {field.value
+                                ? cases.find((c) => c.value === field.value)
+                                    ?.label
+                                : "Select case..."}
+                              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-[384px] p-0">
+                          <Command>
+                            <CommandInput placeholder="Search case..." />
+                            <CommandEmpty>No case found.</CommandEmpty>
+                            <CommandGroup>
+                              {cases.map((c) => (
+                                <CommandItem
+                                  value={c.label}
+                                  key={c.value}
+                                  onSelect={() => {
+                                    form.setValue("caseId", c.value);
+                                  }}
+                                >
+                                  <Check
+                                    className={cn(
+                                      "mr-2 h-4 w-4",
+                                      c.value === field.value
+                                        ? "opacity-100"
+                                        : "opacity-0",
+                                    )}
+                                  />
+                                  {c.label}
+                                </CommandItem>
+                              ))}
+                            </CommandGroup>
+                          </Command>
+                        </PopoverContent>
+                      </Popover>
+                      <Button>Add</Button>
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ) : null}
             <FormField
               name="amount"
               control={form.control}
@@ -179,7 +259,7 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
               name="propertyOwner.phone"
               control={form.control}
               render={({ field }) => (
-                <FormItem className="col-span-4">
+                <FormItem className="col-span-2">
                   <FormLabel>Property owner phone</FormLabel>
                   <FormControl>
                     <PhoneInput {...field} placeholder="Phone" />
@@ -193,7 +273,7 @@ export function AddDepositDialog({ caseId }: { caseId: number }) {
               name="propertyOwner.email"
               control={form.control}
               render={({ field }) => (
-                <FormItem className="col-span-4">
+                <FormItem className="col-span-2">
                   <FormLabel>Property owner email</FormLabel>
                   <FormControl>
                     <Input {...field} placeholder="Email" />

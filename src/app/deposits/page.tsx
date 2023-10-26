@@ -1,6 +1,7 @@
 import { auth, SignedIn } from "@clerk/nextjs";
 import { api } from "~/trpc/server";
 import { DepositsContainer } from "~/app/_components/deposits/deposits-container";
+import { AddDepositDialog } from "../_components/add-deposit-dialog";
 
 export default async function Deposits() {
   const { userId } = auth();
@@ -17,7 +18,9 @@ export default async function Deposits() {
               <h2 className="text-2xl font-bold tracking-tight">Deposits</h2>
               <p className="text-muted-foreground">All deposited property</p>
             </div>
-            <div></div>
+            <div>
+              <AddDepositDialog caseId={null} />
+            </div>
           </div>
           <DepositsContainer deposits={deposits} />
         </div>
