@@ -84,13 +84,22 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
   const router = useRouter();
   const { toast } = useToast();
 
+  const sendApprovalRequestEmailMutation =
+    api.email.sendApprovalRequestEmail.useMutation();
+
   const createDistributionRequestMutation =
     api.disbursementRequest.create.useMutation({
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast({
           description: "Disbursement request created",
         });
         form.reset();
+        if (data?.slug) {
+          sendApprovalRequestEmailMutation.mutate({
+            text: "Testing",
+            slug: data.slug,
+          });
+        }
         router.refresh();
         setOpen(false);
       },

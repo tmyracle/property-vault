@@ -62,7 +62,7 @@ export const disbursementRequestRouter = createTRPCRouter({
         }
       }
 
-      await ctx.db.insert(disbursementRequests).values({
+      const createdRequest = await ctx.db.insert(disbursementRequests).values({
         caseId: input.caseId,
         propertyOwnerId: input.propertyOwnerId,
         amount: input.amount.toString(),
@@ -72,6 +72,17 @@ export const disbursementRequestRouter = createTRPCRouter({
         slug: uuidv4(),
         createdBy: ctx.auth.userId,
         orgId: ctx.auth.orgId!,
+      });
+
+      return ctx.db.query.disbursementRequests.findFirst({
+        where: and(
+          eq(disbursementRequests.id, Number(createdRequest.insertId)),
+          eq(disbursementRequests.orgId, ctx.auth.orgId!),
+        ),
+        columns: {
+          id: true,
+          slug: true,
+        },
       });
     }),
   getRequestsForCase: protectedProcedure
