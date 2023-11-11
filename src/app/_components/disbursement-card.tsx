@@ -139,7 +139,7 @@ export function DisbursementCard({
         </div>
       </CardContent>
       {user &&
-      user.publicMetadata.role === "admin" &&
+      ["admin", "supervisor"].includes(user.publicMetadata.role as string) &&
       disbursement.status === "pending" ? (
         <>
           <Separator className="mb-6" />
