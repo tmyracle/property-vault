@@ -95,7 +95,7 @@ export const deposits = mysqlTable("deposit", {
     .notNull(),
   updatedAt: timestamp("updated_at").onUpdateNow(),
   caseId: bigint("case_id", { mode: "number" }).notNull(),
-  propertyOwnerId: bigint("property_owner_id", { mode: "number" }).notNull(),
+  propertyOwnerId: bigint("property_owner_id", { mode: "number" }),
   itemNumber: varchar("item_number", { length: 256 }),
   amount: decimal("amount", { precision: 19, scale: 4 }).notNull(),
   description: text("description"),
@@ -124,7 +124,7 @@ export const disbursementRequests = mysqlTable("disbursement_request", {
     .notNull(),
   updatedAt: timestamp("updated_at").onUpdateNow(),
   caseId: bigint("case_id", { mode: "number" }).notNull(),
-  propertyOwnerId: bigint("property_owner_id", { mode: "number" }).notNull(),
+  propertyOwnerId: bigint("property_owner_id", { mode: "number" }),
   description: text("description"),
   distributeTo: mysqlEnum("distribute_to", [
     "property_owner",

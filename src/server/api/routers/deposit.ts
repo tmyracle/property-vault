@@ -28,43 +28,52 @@ export const depositRouter = createTRPCRouter({
         amount: z.string(),
         itemNumber: z.string(),
         description: z.string(),
-        propertyOwner: z.object({
-          name: z.string(),
-          phone: z.string(),
-          email: z.string().nullable(),
-        }),
-        address: z.object({
-          street: z.string(),
-          unit: z.string(),
-          city: z.string(),
-          state: z.string(),
-          zip: z.string(),
-        }),
+        propertyOwner: z
+          .object({
+            name: z.string(),
+            phone: z.string(),
+            email: z.string().nullable(),
+          })
+          .optional(),
+        address: z
+          .object({
+            street: z.string(),
+            unit: z.string(),
+            city: z.string(),
+            state: z.string(),
+            zip: z.string(),
+          })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      const propertyOwner = await ctx.db.insert(propertyOwners).values({
-        name: input.propertyOwner.name,
-        phone: input.propertyOwner.phone,
-        email: input.propertyOwner.email,
-        createdBy: ctx.auth.userId,
-        orgId: ctx.auth.orgId!,
-      });
+      let propertyOwner = null;
+      if (input.propertyOwner) {
+        propertyOwner = await ctx.db.insert(propertyOwners).values({
+          name: input.propertyOwner.name,
+          phone: input.propertyOwner.phone,
+          email: input.propertyOwner.email,
+          createdBy: ctx.auth.userId,
+          orgId: ctx.auth.orgId!,
+        });
+      }
 
-      await ctx.db.insert(addresses).values({
-        street: input.address.street,
-        unit: input.address.unit,
-        city: input.address.city,
-        state: input.address.state,
-        zip: input.address.zip,
-        ownerId: Number(propertyOwner.insertId),
-        createdBy: ctx.auth.userId,
-        orgId: ctx.auth.orgId!,
-      });
+      if (input.address && propertyOwner) {
+        await ctx.db.insert(addresses).values({
+          street: input.address.street,
+          unit: input.address.unit,
+          city: input.address.city,
+          state: input.address.state,
+          zip: input.address.zip,
+          ownerId: Number(propertyOwner.insertId),
+          createdBy: ctx.auth.userId,
+          orgId: ctx.auth.orgId!,
+        });
+      }
 
       await ctx.db.insert(deposits).values({
         caseId: input.caseId,
-        propertyOwnerId: Number(propertyOwner.insertId),
+        propertyOwnerId: Number(propertyOwner?.insertId) ?? null,
         amount: input.amount.toString(),
         itemNumber: input.itemNumber,
         description: input.description,
@@ -119,17 +128,12 @@ export const depositRouter = createTRPCRouter({
       },
     });
 
-    const uniquePropertyOwners = depositResults
-      .map((request) => request.propertyOwner.name)
-      .filter((value, index, self) => self.indexOf(value) === index);
-
     const uniqueCaseNumbers = depositResults
       .map((request) => request.case.caseNumber)
       .filter((value, index, self) => self.indexOf(value) === index);
 
     return {
       caseNumbers: uniqueCaseNumbers,
-      propertyOwners: uniquePropertyOwners,
     };
   }),
 });

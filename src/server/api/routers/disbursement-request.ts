@@ -3,7 +3,12 @@ import { z } from "zod";
 import { eq, and } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { disbursementRequests, cases } from "~/server/db/schema";
+import {
+  disbursementRequests,
+  cases,
+  propertyOwners,
+  addresses,
+} from "~/server/db/schema";
 import { clerkClient } from "@clerk/nextjs";
 import { type OrganizationMembership } from "@clerk/nextjs/dist/types/server";
 import { v4 as uuidv4 } from "uuid";
@@ -13,11 +18,27 @@ export const disbursementRequestRouter = createTRPCRouter({
     .input(
       z.object({
         caseId: z.number(),
-        propertyOwnerId: z.number(),
+        propertyOwnerId: z.number().optional(),
         amount: z.string(),
         description: z.string(),
         distributeTo: z.enum(["property_owner", "forfeit"]),
         status: z.enum(["pending", "approved", "rejected"]),
+        propertyOwner: z
+          .object({
+            name: z.string(),
+            phone: z.string(),
+            email: z.string().optional(),
+          })
+          .optional(),
+        address: z
+          .object({
+            street: z.string(),
+            unit: z.string(),
+            city: z.string(),
+            state: z.string(),
+            zip: z.string(),
+          })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -62,17 +83,59 @@ export const disbursementRequestRouter = createTRPCRouter({
         }
       }
 
-      const createdRequest = await ctx.db.insert(disbursementRequests).values({
-        caseId: input.caseId,
-        propertyOwnerId: input.propertyOwnerId,
-        amount: input.amount.toString(),
-        description: input.description,
-        distributeTo: input.distributeTo,
-        status: input.status,
-        slug: uuidv4(),
-        createdBy: ctx.auth.userId,
-        orgId: ctx.auth.orgId!,
-      });
+      let createdRequest = null;
+      if (input.propertyOwner) {
+        const createdPropertyOwner = await ctx.db
+          .insert(propertyOwners)
+          .values({
+            name: input.propertyOwner.name,
+            phone: input.propertyOwner.phone,
+            email: input.propertyOwner.email,
+            createdBy: ctx.auth.userId,
+            orgId: ctx.auth.orgId!,
+          });
+
+        if (input.address) {
+          await ctx.db.insert(addresses).values({
+            street: input.address.street,
+            unit: input.address.unit,
+            city: input.address.city,
+            state: input.address.state,
+            zip: input.address.zip,
+            ownerId: Number(createdPropertyOwner.insertId),
+            createdBy: ctx.auth.userId,
+            orgId: ctx.auth.orgId!,
+          });
+        }
+
+        createdRequest = await ctx.db.insert(disbursementRequests).values({
+          caseId: input.caseId,
+          propertyOwnerId: Number(createdPropertyOwner.insertId),
+          amount: input.amount.toString(),
+          description: input.description,
+          distributeTo: input.distributeTo,
+          status: input.status,
+          slug: uuidv4(),
+          createdBy: ctx.auth.userId,
+          orgId: ctx.auth.orgId!,
+        });
+      } else if (input.propertyOwnerId) {
+        createdRequest = await ctx.db.insert(disbursementRequests).values({
+          caseId: input.caseId,
+          propertyOwnerId: input.propertyOwnerId,
+          amount: input.amount.toString(),
+          description: input.description,
+          distributeTo: input.distributeTo,
+          status: input.status,
+          slug: uuidv4(),
+          createdBy: ctx.auth.userId,
+          orgId: ctx.auth.orgId!,
+        });
+      }
+
+      if (!createdRequest) {
+        throw new Error("Unable to create request");
+      }
 
       return ctx.db.query.disbursementRequests.findFirst({
         where: and(

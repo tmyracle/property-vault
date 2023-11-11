@@ -65,13 +65,13 @@ interface ExtendedCase extends Case {
 }
 
 interface DepositExtended extends Deposit {
-  propertyOwner: PropertyOwnerExtended;
+  propertyOwner?: PropertyOwnerExtended;
   case: ExtendedCase;
 }
 
 const formSchema = z.object({
   caseId: z.number(),
-  propertyOwnerId: z.number(),
+  propertyOwnerId: z.number().optional(),
   description: z.string(),
   distributeTo: z.enum(["property_owner", "forfeit"]),
   status: z.enum(["pending", "approved", "rejected"]),
@@ -117,7 +117,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       caseId: deposit?.caseId,
-      propertyOwnerId: deposit?.propertyOwner.id,
+      propertyOwnerId: deposit?.propertyOwner?.id,
       description: "",
       distributeTo: "property_owner",
       status: "pending",
@@ -129,7 +129,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
     let total = Number(deposit.amount);
     deposit.case.disbursementRequests.forEach((disbursementRequest) => {
       if (
-        disbursementRequest.propertyOwner.name === deposit.propertyOwner.name
+        disbursementRequest.propertyOwner.name === deposit.propertyOwner?.name
       ) {
         total -= Number(disbursementRequest.amount);
       }
@@ -139,7 +139,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
 
   function updateFormValues(deposit: DepositExtended) {
     form.setValue("caseId", deposit.caseId);
-    form.setValue("propertyOwnerId", deposit.propertyOwner.id);
+    form.setValue("propertyOwnerId", deposit.propertyOwner?.id);
     form.setValue("amount", remainingBalance(deposit).toString());
   }
 
@@ -156,25 +156,16 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-9 items-center justify-start gap-2 text-sm font-medium">
-        <div className="col-span-2 space-y-1">Property Owner</div>
-        <div className="col-span-1">Item #</div>
-        <div className="col-span-3">Description</div>
+        <div className="col-span-2">Item #</div>
+        <div className="col-span-4">Description</div>
         <div className="col-span-2 justify-self-end">Value</div>
         <div className="col-span-1"></div>
       </div>
 
       {deposits.map((deposit) => (
         <div key={deposit.id} className="grid grid-cols-9 items-center gap-2">
-          <div className="col-span-2 space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {deposit.propertyOwner.name}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {deposit.propertyOwner.email}
-            </p>
-          </div>
-          <div className="col-span-1 text-sm">{deposit.itemNumber}</div>
-          <div className="col-span-3 truncate text-sm">
+          <div className="col-span-2 text-sm">{deposit.itemNumber}</div>
+          <div className="col-span-4 truncate text-sm">
             {deposit.description}
           </div>
           <div className="col-span-2 justify-self-end font-medium">

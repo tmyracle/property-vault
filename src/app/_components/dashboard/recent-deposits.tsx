@@ -40,6 +40,7 @@ import {
   SelectItem,
   SelectValue,
 } from "~/app/_components/ui/select";
+import PhoneInput from "~/app/_components/ui/phone-input";
 import { useToast } from "~/app/_components/ui/use-toast";
 
 import { Input } from "~/app/_components/ui/input";
@@ -50,21 +51,37 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
 
 interface PropertyOwnerExtended extends PropertyOwner {
-  addresses: Address[];
+  addresses?: Address[];
 }
 
 interface DepositExtended extends Deposit {
-  propertyOwner: PropertyOwnerExtended;
+  propertyOwner: PropertyOwnerExtended | null;
   case: Case;
 }
 
 const formSchema = z.object({
   caseId: z.number(),
-  propertyOwnerId: z.number(),
+  propertyOwnerId: z.number().optional(),
   description: z.string(),
   distributeTo: z.enum(["property_owner", "forfeit"]),
   status: z.enum(["pending", "approved", "rejected"]),
   amount: z.string(),
+  propertyOwner: z
+    .object({
+      name: z.string(),
+      phone: z.string(),
+      email: z.string().email().optional(),
+    })
+    .optional(),
+  address: z
+    .object({
+      street: z.string(),
+      unit: z.string(),
+      city: z.string(),
+      state: z.string(),
+      zip: z.string(),
+    })
+    .optional(),
 });
 
 export function RecentDepositList({
@@ -101,7 +118,7 @@ export function RecentDepositList({
     resolver: zodResolver(formSchema),
     defaultValues: {
       caseId: deposit?.caseId,
-      propertyOwnerId: deposit?.propertyOwner.id,
+      propertyOwnerId: deposit?.propertyOwner?.id,
       description: "",
       distributeTo: "property_owner",
       status: "pending",
@@ -111,7 +128,7 @@ export function RecentDepositList({
 
   function updateFormValues(deposit: DepositExtended) {
     form.setValue("caseId", deposit.caseId);
-    form.setValue("propertyOwnerId", deposit.propertyOwner.id);
+    form.setValue("propertyOwnerId", deposit.propertyOwner?.id);
     form.setValue("amount", deposit.amount.toString());
   }
 
@@ -127,25 +144,16 @@ export function RecentDepositList({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-9 items-center justify-start gap-2 text-sm font-medium">
-        <div className="col-span-2">Case</div>
-        <div className="col-span-3 space-y-1">Property Owner</div>
+      <div className="grid grid-cols-7 items-center justify-start gap-2 text-sm font-medium">
+        <div className="col-span-3">Case</div>
         <div className="col-span-1">Item #</div>
         <div className="col-span-2 justify-self-end">Value</div>
         <div className="col-span-1"></div>
       </div>
 
       {deposits.map((deposit) => (
-        <div key={deposit.id} className="grid grid-cols-9 items-center gap-2">
-          <div className="col-span-2 text-sm">{deposit.case.caseNumber}</div>
-          <div className="col-span-3 space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {deposit.propertyOwner.name}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {deposit.propertyOwner.email}
-            </p>
-          </div>
+        <div key={deposit.id} className="grid grid-cols-7 items-center gap-2">
+          <div className="col-span-3 text-sm">{deposit.case.caseNumber}</div>
           <div className="col-span-1 text-sm">{deposit.itemNumber}</div>
           <div className="col-span-2 justify-self-end font-medium">
             {new Intl.NumberFormat("en-US", {
@@ -193,7 +201,7 @@ export function RecentDepositList({
                       name="amount"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2">
                           <FormLabel>Amount</FormLabel>
                           <FormControl>
                             <Input placeholder="Amount" {...field} />
@@ -210,7 +218,7 @@ export function RecentDepositList({
                       name="description"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2">
                           <FormLabel>Description</FormLabel>
                           <FormControl>
                             <Input {...field} placeholder="Description" />
@@ -224,7 +232,7 @@ export function RecentDepositList({
                       name="distributeTo"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-2">
                           <FormLabel>Disburse to</FormLabel>
                           <Select
                             onValueChange={field.onChange}
@@ -247,7 +255,109 @@ export function RecentDepositList({
                       )}
                     />
 
-                    <DialogFooter className="sm:justify-between">
+                    {form.getValues().distributeTo === "property_owner" && (
+                      <>
+                        <FormField
+                          name="propertyOwner.name"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Property owner name</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Name" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="propertyOwner.phone"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Property owner phone</FormLabel>
+                              <FormControl>
+                                <PhoneInput {...field} placeholder="Phone" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.street"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>Street</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Street" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.unit"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>Unit</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Unit" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.city"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="City" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.state"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>State</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="State" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.zip"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Zip</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Zip" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
+
+                    <DialogFooter className="col-span-2 sm:justify-between">
                       <DialogClose asChild>
                         <Button type="button" variant="secondary">
                           Cancel

@@ -61,22 +61,6 @@ export const columns: ColumnDef<ExtendedDeposit, any>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "owner",
-    accessorFn: (row) => row.propertyOwner.name,
-    header: ({ column }) => (
-      <DepositTableColumnHeader column={column} title="Owner" />
-    ),
-    cell: ({ row }) => (
-      <div className="">{row.original.propertyOwner.name}</div>
-    ),
-    filterFn: (row, id, value) => {
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
-      return value.includes(row.original.propertyOwner.name);
-    },
-    enableSorting: true,
-    enableHiding: false,
-  },
-  {
     accessorKey: "amount",
     header: ({ column }) => (
       <DepositTableColumnHeader column={column} title="Amount" />

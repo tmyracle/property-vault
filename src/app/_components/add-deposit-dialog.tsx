@@ -52,30 +52,6 @@ const formSchema = z.object({
   }),
   itemNumber: z.string(),
   description: z.string(),
-  propertyOwner: z.object({
-    name: z.string().min(1, {
-      message: "Name is required",
-    }),
-    phone: z.string().min(1, {
-      message: "Phone is required",
-    }),
-    email: z.string(),
-  }),
-  address: z.object({
-    street: z.string().min(1, {
-      message: "Street is required",
-    }),
-    unit: z.string(),
-    city: z.string().min(1, {
-      message: "City is required",
-    }),
-    state: z.string().min(1, {
-      message: "State is required",
-    }),
-    zip: z.string().min(1, {
-      message: "Zip is required",
-    }),
-  }),
 });
 
 export function AddDepositDialog({ caseId }: { caseId: number | null }) {
@@ -102,18 +78,6 @@ export function AddDepositDialog({ caseId }: { caseId: number | null }) {
       amount: "0",
       itemNumber: "",
       description: "",
-      propertyOwner: {
-        name: "",
-        phone: "",
-        email: "",
-      },
-      address: {
-        street: "",
-        unit: "",
-        city: "",
-        state: "",
-        zip: "",
-      },
     },
   });
 
@@ -249,118 +213,6 @@ export function AddDepositDialog({ caseId }: { caseId: number | null }) {
                     <FormDescription>
                       (optional) A description of the deposit.
                     </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="propertyOwner.name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-4">
-                    <FormLabel>Property owner name</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Name" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="propertyOwner.phone"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Property owner phone</FormLabel>
-                    <FormControl>
-                      <PhoneInput {...field} placeholder="Phone" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="propertyOwner.email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Property owner email</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Email" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="address.street"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Street</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Street" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="address.unit"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>Unit</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Unit" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="address.city"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-2">
-                    <FormLabel>City</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="City" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="address.state"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-1">
-                    <FormLabel>State</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="State" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                name="address.zip"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem className="col-span-1">
-                    <FormLabel>Zip</FormLabel>
-                    <FormControl>
-                      <Input {...field} placeholder="Zip" />
-                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

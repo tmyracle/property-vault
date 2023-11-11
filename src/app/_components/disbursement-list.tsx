@@ -14,7 +14,7 @@ import {
 import { useRouter } from "next/navigation";
 
 interface DisbursementRequestExtended extends DisbursementRequest {
-  propertyOwner: PropertyOwner;
+  propertyOwner: PropertyOwner | null;
 }
 
 export function DisbursementList({
@@ -40,9 +40,17 @@ export function DisbursementList({
           className="grid grid-cols-9 items-center gap-2"
         >
           <div className="col-span-4 space-y-1">
-            <p className="text-sm font-medium leading-none">
-              {disbursementRequest.propertyOwner.name}
-            </p>
+            {disbursementRequest.distributeTo === "property_owner" &&
+            disbursementRequest.propertyOwner ? (
+              <p className="text-sm font-medium leading-none">
+                {disbursementRequest.propertyOwner.name}
+              </p>
+            ) : (
+              <p className="text-sm font-medium leading-none">
+                Forfeit / Abandoned
+              </p>
+            )}
+
             <p className="truncate text-sm text-muted-foreground">
               {disbursementRequest.description}
             </p>
