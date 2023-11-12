@@ -10,7 +10,6 @@ import {
 import { Separator } from "~/app/_components/ui/separator";
 import { Cross1Icon } from "@radix-ui/react-icons";
 import { useRouter, useSearchParams } from "next/navigation";
-import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 interface DisbursementCardProps {
   deposit: ExtendedDeposit;
@@ -81,38 +80,6 @@ export function DepositCard({
           <div className="text-sm font-medium text-gray-900">Description</div>
           <div className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
             {deposit.description}
-          </div>
-        </div>
-
-        <Separator />
-        <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
-          <div className="text-sm font-medium text-gray-900">
-            Property owner
-          </div>
-          <div className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-            <div>
-              <div className="text-sm">{deposit.propertyOwner.name}</div>
-              <div className="text-sm text-muted-foreground">
-                {deposit.propertyOwner.email}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {parsePhoneNumberFromString(
-                  deposit.propertyOwner.phone ?? "",
-                  "US",
-                )?.formatNational()}
-              </div>
-              {deposit.propertyOwner.addresses?.length > 0 ? (
-                <div className="text-sm">
-                  <div>{deposit.propertyOwner.addresses[0]?.street}</div>
-                  <div>{deposit.propertyOwner.addresses[0]?.unit}</div>
-                  <div>
-                    {deposit.propertyOwner.addresses[0]?.city},{" "}
-                    {deposit.propertyOwner.addresses[0]?.state}{" "}
-                    {deposit.propertyOwner.addresses[0]?.zip}
-                  </div>
-                </div>
-              ) : null}
-            </div>
           </div>
         </div>
       </CardContent>

@@ -15,8 +15,6 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-  type Cell,
-  type Row,
 } from "@tanstack/react-table";
 import { rankItem, type RankingInfo } from "@tanstack/match-sorter-utils";
 
@@ -32,13 +30,9 @@ import {
 import { DepositTablePagination } from "./deposit-table-pagination";
 import { DepositTableToolbar } from "./deposit-table-toolbar";
 
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
-import { type ExtendedDeposit } from "./columns";
-
 interface DepositTableProps<TData, TValue> {
   columns: (ColumnDef<TData, TValue> & { accessorFn?: unknown })[];
   data: TData[];
-  selectedDeposit: ExtendedDeposit | null;
 }
 
 declare module "@tanstack/table-core" {
@@ -71,7 +65,6 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 export function DepositTable<TData, TValue>({
   columns,
   data,
-  selectedDeposit,
 }: DepositTableProps<TData, TValue>) {
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
@@ -81,9 +74,6 @@ export function DepositTable<TData, TValue>({
   );
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const pathname = usePathname();
 
   const table = useReactTable({
     data,
@@ -112,29 +102,6 @@ export function DepositTable<TData, TValue>({
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
   });
-
-  const createQueryString = React.useCallback(
-    (name: string, value: string) => {
-      const params = new URLSearchParams(searchParams);
-      params.set(name, value);
-
-      return params.toString();
-    },
-    [searchParams],
-  );
-
-  const handleNavigation = (cell: Cell<TData, TValue>, row: Row<TData>) => {
-    if (cell.column.columnDef.id !== "actions") {
-      router.push(
-        pathname +
-          "?" +
-          createQueryString(
-            "id",
-            (row.original as ExtendedDeposit).slug!.toString(),
-          ),
-      );
-    }
-  };
 
   return (
     <div className="space-y-4">
@@ -168,24 +135,10 @@ export function DepositTable<TData, TValue>({
               table.getRowModel().rows.map((row) => (
                 <TableRow
                   key={row.id}
-                  className={
-                    selectedDeposit &&
-                    (row.original as ExtendedDeposit).id === selectedDeposit.id
-                      ? "bg-gray-100"
-                      : ""
-                  }
                   data-state={row.getIsSelected() && "selected"}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <TableCell
-                      key={cell.id}
-                      className={
-                        cell.column.columnDef.id === "actions"
-                          ? ""
-                          : "hover:cursor-pointer"
-                      }
-                      onClick={() => handleNavigation(cell, row)}
-                    >
+                    <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),

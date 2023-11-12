@@ -12,7 +12,7 @@ import { DepositTableRowActions } from "./deposit-table-row-actions";
 
 export interface ExtendedDeposit extends Deposit {
   case: Case;
-  propertyOwner: ExtendedPropertyOwner;
+  propertyOwner: ExtendedPropertyOwner | null;
 }
 
 interface ExtendedPropertyOwner extends PropertyOwner {
