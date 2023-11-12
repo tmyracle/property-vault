@@ -1,6 +1,6 @@
 //import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { eq, and } from "drizzle-orm";
+import { eq, and, desc, asc } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import {
@@ -27,13 +27,13 @@ export const disbursementRequestRouter = createTRPCRouter({
           .object({
             name: z.string(),
             phone: z.string(),
-            email: z.string().optional(),
+            email: z.string().email().optional(),
           })
           .optional(),
         address: z
           .object({
             street: z.string(),
-            unit: z.string(),
+            unit: z.string().optional(),
             city: z.string(),
             state: z.string(),
             zip: z.string(),
@@ -123,6 +123,17 @@ export const disbursementRequestRouter = createTRPCRouter({
         createdRequest = await ctx.db.insert(disbursementRequests).values({
           caseId: input.caseId,
           propertyOwnerId: input.propertyOwnerId,
+          amount: input.amount.toString(),
+          description: input.description,
+          distributeTo: input.distributeTo,
+          status: input.status,
+          slug: uuidv4(),
+          createdBy: ctx.auth.userId,
+          orgId: ctx.auth.orgId!,
+        });
+      } else {
+        createdRequest = await ctx.db.insert(disbursementRequests).values({
+          caseId: input.caseId,
           amount: input.amount.toString(),
           description: input.description,
           distributeTo: input.distributeTo,

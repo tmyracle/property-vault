@@ -45,8 +45,8 @@ import { useToast } from "~/app/_components/ui/use-toast";
 
 import { Input } from "~/app/_components/ui/input";
 import { useRouter } from "next/navigation";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { type ZodSchema, z } from "zod";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
 
@@ -76,13 +76,15 @@ const formSchema = z.object({
   address: z
     .object({
       street: z.string(),
-      unit: z.string(),
+      unit: z.string().optional(),
       city: z.string(),
       state: z.string(),
       zip: z.string(),
     })
     .optional(),
 });
+
+type FormSchemaType = z.infer<typeof formSchema>;
 
 export function RecentDepositList({
   deposits,
@@ -93,6 +95,46 @@ export function RecentDepositList({
   const [deposit, setDeposit] = useState<DepositExtended | null>(null);
   const router = useRouter();
   const { toast } = useToast();
+
+  const resolver: Resolver<FormSchemaType> = async (
+    values,
+    context,
+    options,
+  ) => {
+    let schema: ZodSchema<FormSchemaType> = formSchema;
+    if (values.distributeTo === "property_owner") {
+      schema = z.object({
+        caseId: z.number(),
+        propertyOwnerId: z.number().optional(),
+        description: z.string(),
+        distributeTo: z.enum(["property_owner", "forfeit"]),
+        status: z.enum(["pending", "approved", "rejected"]),
+        amount: z.string(),
+        propertyOwner: z.object({
+          name: z.string(),
+          phone: z.string(),
+          email: z.string().email().optional(),
+        }),
+        address: z.object({
+          street: z.string(),
+          unit: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          zip: z.string(),
+        }),
+      });
+    } else {
+      schema = z.object({
+        caseId: z.number(),
+        propertyOwnerId: z.number().optional(),
+        description: z.string(),
+        distributeTo: z.enum(["property_owner", "forfeit"]),
+        status: z.enum(["pending", "approved", "rejected"]),
+        amount: z.string(),
+      });
+    }
+    return zodResolver(schema)(values, context, options);
+  };
 
   const createDistributionRequestMutation =
     api.disbursementRequest.create.useMutation({
@@ -115,7 +157,7 @@ export function RecentDepositList({
       },
     });
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: resolver,
     defaultValues: {
       caseId: deposit?.caseId,
       propertyOwnerId: deposit?.propertyOwner?.id,
@@ -123,6 +165,8 @@ export function RecentDepositList({
       distributeTo: "property_owner",
       status: "pending",
       amount: deposit?.amount.toString() ?? "",
+      propertyOwner: undefined,
+      address: undefined,
     },
   });
 
@@ -133,6 +177,7 @@ export function RecentDepositList({
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    console.log("Trying to submit");
     if (Number(values.amount) > Number(deposit?.amount)) {
       form.setError("amount", {
         message: "Amount cannot be greater than deposit amount",

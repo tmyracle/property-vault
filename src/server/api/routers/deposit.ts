@@ -73,7 +73,9 @@ export const depositRouter = createTRPCRouter({
 
       await ctx.db.insert(deposits).values({
         caseId: input.caseId,
-        propertyOwnerId: Number(propertyOwner?.insertId) ?? null,
+        propertyOwnerId: propertyOwner?.insertId
+          ? Number(propertyOwner?.insertId)
+          : null,
         amount: input.amount.toString(),
         itemNumber: input.itemNumber,
         description: input.description,

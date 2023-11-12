@@ -41,6 +41,7 @@ import {
   SelectValue,
 } from "~/app/_components/ui/select";
 import { useToast } from "~/app/_components/ui/use-toast";
+import PhoneInput from "~/app/_components/ui/phone-input";
 
 import { Input } from "~/app/_components/ui/input";
 import { useRouter } from "next/navigation";
@@ -57,7 +58,7 @@ interface ExtendedCase extends Case {
   disbursementRequests: {
     id: number;
     amount: string;
-    propertyOwner: {
+    propertyOwner?: {
       id: number;
       name: string;
     };
@@ -76,6 +77,22 @@ const formSchema = z.object({
   distributeTo: z.enum(["property_owner", "forfeit"]),
   status: z.enum(["pending", "approved", "rejected"]),
   amount: z.string(),
+  propertyOwner: z.optional(
+    z.object({
+      name: z.string(),
+      phone: z.string(),
+      email: z.string().email().optional(),
+    }),
+  ),
+  address: z.optional(
+    z.object({
+      street: z.string(),
+      unit: z.string(),
+      city: z.string(),
+      state: z.string(),
+      zip: z.string(),
+    }),
+  ),
 });
 
 export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
@@ -122,6 +139,8 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
       distributeTo: "property_owner",
       status: "pending",
       amount: deposit?.amount.toString() ?? "",
+      propertyOwner: undefined,
+      address: undefined,
     },
   });
 
@@ -129,6 +148,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
     let total = Number(deposit.amount);
     deposit.case.disbursementRequests.forEach((disbursementRequest) => {
       if (
+        disbursementRequest.propertyOwner &&
         disbursementRequest.propertyOwner.name === deposit.propertyOwner?.name
       ) {
         total -= Number(disbursementRequest.amount);
@@ -269,6 +289,108 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                         </FormItem>
                       )}
                     />
+
+                    {form.getValues().distributeTo === "property_owner" && (
+                      <>
+                        <FormField
+                          name="propertyOwner.name"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Property owner name</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Name" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="propertyOwner.phone"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Property owner phone</FormLabel>
+                              <FormControl>
+                                <PhoneInput {...field} placeholder="Phone" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.street"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>Street</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Street" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.unit"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>Unit</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Unit" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.city"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-2">
+                              <FormLabel>City</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="City" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.state"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>State</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="State" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          name="address.zip"
+                          control={form.control}
+                          render={({ field }) => (
+                            <FormItem className="col-span-1">
+                              <FormLabel>Zip</FormLabel>
+                              <FormControl>
+                                <Input {...field} placeholder="Zip" />
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </>
+                    )}
 
                     <DialogFooter className="sm:justify-between">
                       <DialogClose asChild>

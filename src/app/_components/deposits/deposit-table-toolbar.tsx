@@ -31,12 +31,6 @@ export function DepositTableToolbar<TData>({
       label: caseNumber,
     })) ?? [];
 
-  const owners =
-    filterData.data?.propertyOwners?.map((owner: string) => ({
-      value: owner,
-      label: owner,
-    })) ?? [];
-
   return (
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
@@ -53,13 +47,6 @@ export function DepositTableToolbar<TData>({
             column={table.getColumn("Case Number")}
             title="Case"
             options={caseNumbers}
-          />
-        )}
-        {table.getColumn("owner") && (
-          <DepositTableFacetedFilter
-            column={table.getColumn("owner")}
-            title="Owner"
-            options={owners}
           />
         )}
         {isFiltered && (
