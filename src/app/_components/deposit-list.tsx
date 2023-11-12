@@ -45,8 +45,8 @@ import PhoneInput from "~/app/_components/ui/phone-input";
 
 import { Input } from "~/app/_components/ui/input";
 import { useRouter } from "next/navigation";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
+import { z, type ZodSchema } from "zod";
+import { useForm, type Resolver } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
 
@@ -58,15 +58,15 @@ interface ExtendedCase extends Case {
   disbursementRequests: {
     id: number;
     amount: string;
-    propertyOwner?: {
+    propertyOwner: {
       id: number;
       name: string;
-    };
+    } | null;
   }[];
 }
 
 interface DepositExtended extends Deposit {
-  propertyOwner?: PropertyOwnerExtended;
+  propertyOwner: PropertyOwnerExtended | null;
   case: ExtendedCase;
 }
 
@@ -77,23 +77,25 @@ const formSchema = z.object({
   distributeTo: z.enum(["property_owner", "forfeit"]),
   status: z.enum(["pending", "approved", "rejected"]),
   amount: z.string(),
-  propertyOwner: z.optional(
-    z.object({
+  propertyOwner: z
+    .object({
       name: z.string(),
       phone: z.string(),
       email: z.string().email().optional(),
-    }),
-  ),
-  address: z.optional(
-    z.object({
+    })
+    .optional(),
+  address: z
+    .object({
       street: z.string(),
-      unit: z.string(),
+      unit: z.string().optional(),
       city: z.string(),
       state: z.string(),
       zip: z.string(),
-    }),
-  ),
+    })
+    .optional(),
 });
+
+type FormSchemaType = z.infer<typeof formSchema>;
 
 export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
   const [open, setOpen] = useState(false);
@@ -130,8 +132,49 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
         });
       },
     });
+
+  const resolver: Resolver<FormSchemaType> = async (
+    values,
+    context,
+    options,
+  ) => {
+    let schema: ZodSchema<FormSchemaType> = formSchema;
+    if (values.distributeTo === "property_owner") {
+      schema = z.object({
+        caseId: z.number(),
+        propertyOwnerId: z.number().optional(),
+        description: z.string(),
+        distributeTo: z.enum(["property_owner", "forfeit"]),
+        status: z.enum(["pending", "approved", "rejected"]),
+        amount: z.string(),
+        propertyOwner: z.object({
+          name: z.string(),
+          phone: z.string(),
+          email: z.string().email().optional(),
+        }),
+        address: z.object({
+          street: z.string(),
+          unit: z.string().optional(),
+          city: z.string(),
+          state: z.string(),
+          zip: z.string(),
+        }),
+      });
+    } else {
+      schema = z.object({
+        caseId: z.number(),
+        propertyOwnerId: z.number().optional(),
+        description: z.string(),
+        distributeTo: z.enum(["property_owner", "forfeit"]),
+        status: z.enum(["pending", "approved", "rejected"]),
+        amount: z.string(),
+      });
+    }
+    return zodResolver(schema)(values, context, options);
+  };
+
   const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+    resolver: resolver,
     defaultValues: {
       caseId: deposit?.caseId,
       propertyOwnerId: deposit?.propertyOwner?.id,
@@ -229,14 +272,14 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                 </DialogHeader>
                 <Form {...form}>
                   <form
-                    className="grid gap-4 py-2"
+                    className="grid grid-cols-4 gap-4 py-2"
                     onSubmit={form.handleSubmit(onSubmit)}
                   >
                     <FormField
                       name="amount"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-4">
                           <FormLabel>Amount</FormLabel>
                           <FormControl>
                             <Input placeholder="Amount" {...field} />
@@ -253,7 +296,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                       name="description"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-4">
                           <FormLabel>Description</FormLabel>
                           <FormControl>
                             <Input {...field} placeholder="Description" />
@@ -267,7 +310,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                       name="distributeTo"
                       control={form.control}
                       render={({ field }) => (
-                        <FormItem>
+                        <FormItem className="col-span-4">
                           <FormLabel>Disburse to</FormLabel>
                           <Select
                             onValueChange={field.onChange}
@@ -296,7 +339,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                           name="propertyOwner.name"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="col-span-1">
+                            <FormItem className="col-span-2">
                               <FormLabel>Property owner name</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="Name" />
@@ -310,7 +353,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                           name="propertyOwner.phone"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="col-span-1">
+                            <FormItem className="col-span-2">
                               <FormLabel>Property owner phone</FormLabel>
                               <FormControl>
                                 <PhoneInput {...field} placeholder="Phone" />
@@ -324,7 +367,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                           name="address.street"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="col-span-2">
+                            <FormItem className="col-span-3">
                               <FormLabel>Street</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="Street" />
@@ -338,7 +381,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                           name="address.unit"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="col-span-2">
+                            <FormItem className="col-span-1">
                               <FormLabel>Unit</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="Unit" />
@@ -352,7 +395,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                           name="address.city"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="col-span-2">
+                            <FormItem className="col-span-4">
                               <FormLabel>City</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="City" />
@@ -366,7 +409,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                           name="address.state"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="col-span-1">
+                            <FormItem className="col-span-2">
                               <FormLabel>State</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="State" />
@@ -380,7 +423,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                           name="address.zip"
                           control={form.control}
                           render={({ field }) => (
-                            <FormItem className="col-span-1">
+                            <FormItem className="col-span-2">
                               <FormLabel>Zip</FormLabel>
                               <FormControl>
                                 <Input {...field} placeholder="Zip" />
@@ -392,7 +435,7 @@ export function DepositList({ deposits }: { deposits: DepositExtended[] }) {
                       </>
                     )}
 
-                    <DialogFooter className="sm:justify-between">
+                    <DialogFooter className="col-span-4 sm:justify-between">
                       <DialogClose asChild>
                         <Button type="button" variant="secondary">
                           Cancel
