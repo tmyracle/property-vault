@@ -15,8 +15,8 @@ export const fontSans = Inter({
 });
 
 export const metadata = {
-  title: "Property Room",
-  description: "Property Room management system",
+  title: "PropertyVault",
+  description: "Property room management system",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 

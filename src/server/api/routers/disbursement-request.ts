@@ -1,6 +1,6 @@
 //import { eq } from "drizzle-orm";
 import { z } from "zod";
-import { eq, and, desc, asc } from "drizzle-orm";
+import { eq, and, desc } from "drizzle-orm";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import {
@@ -167,6 +167,7 @@ export const disbursementRequestRouter = createTRPCRouter({
         with: {
           propertyOwner: true,
         },
+        orderBy: [desc(disbursementRequests.createdAt)],
       });
     }),
 
@@ -187,6 +188,7 @@ export const disbursementRequestRouter = createTRPCRouter({
         },
         case: true,
       },
+      orderBy: [desc(disbursementRequests.createdAt)],
     });
 
     const buildName = (user: OrganizationMembership) => {
@@ -262,6 +264,7 @@ export const disbursementRequestRouter = createTRPCRouter({
         propertyOwner: true,
         case: true,
       },
+      orderBy: [desc(disbursementRequests.createdAt)],
     });
   }),
 });

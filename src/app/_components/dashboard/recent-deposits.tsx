@@ -96,6 +96,9 @@ export function RecentDepositList({
   const router = useRouter();
   const { toast } = useToast();
 
+  const sendApprovalRequestEmailMutation =
+    api.email.sendApprovalRequestEmail.useMutation();
+
   const resolver: Resolver<FormSchemaType> = async (
     values,
     context,
@@ -138,11 +141,17 @@ export function RecentDepositList({
 
   const createDistributionRequestMutation =
     api.disbursementRequest.create.useMutation({
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast({
           description: "Disbursement request created",
         });
         form.reset();
+        if (data?.slug) {
+          sendApprovalRequestEmailMutation.mutate({
+            text: "Testing",
+            slug: data.slug,
+          });
+        }
         router.refresh();
         setOpen(false);
       },
@@ -177,7 +186,6 @@ export function RecentDepositList({
   }
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log("Trying to submit");
     if (Number(values.amount) > Number(deposit?.amount)) {
       form.setError("amount", {
         message: "Amount cannot be greater than deposit amount",

@@ -25,6 +25,7 @@ export const dashboardRouter = createTRPCRouter({
           propertyOwner: true,
           case: true,
         },
+        orderBy: [desc(disbursementRequests.createdAt)],
       });
 
     const recentDeposits = await ctx.db.query.deposits.findMany({

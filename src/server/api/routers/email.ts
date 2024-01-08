@@ -1,12 +1,8 @@
 import { clerkClient } from "@clerk/nextjs";
+import { env } from "~/env.mjs";
 import { z } from "zod";
 
-import {
-  createTRPCRouter,
-  protectedProcedure,
-  publicProcedure,
-} from "~/server/api/trpc";
-import { posts } from "~/server/db/schema";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const emailRouter = createTRPCRouter({
   sendApprovalRequestEmail: protectedProcedure
@@ -35,7 +31,7 @@ export const emailRouter = createTRPCRouter({
             )?.emailAddress ?? "",
         );
 
-      const response = await fetch("http://localhost:3000/api/send", {
+      const response = await fetch(`${env.NEXT_PUBLIC_DOMAIN}/api/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -43,7 +39,9 @@ export const emailRouter = createTRPCRouter({
         },
         body: JSON.stringify({
           emails: emails,
-          slug: input.slug,
+          emailProps: {
+            slug: input.slug,
+          },
         }),
       });
 
@@ -53,21 +51,4 @@ export const emailRouter = createTRPCRouter({
         throw new Error("Email failed to send");
       }
     }),
-
-  create: publicProcedure
-    .input(z.object({ name: z.string().min(1) }))
-    .mutation(async ({ ctx, input }) => {
-      // simulate a slow db call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
-      await ctx.db.insert(posts).values({
-        name: input.name,
-      });
-    }),
-
-  getLatest: publicProcedure.query(({ ctx }) => {
-    return ctx.db.query.posts.findFirst({
-      orderBy: (posts, { desc }) => [desc(posts.createdAt)],
-    });
-  }),
 });
