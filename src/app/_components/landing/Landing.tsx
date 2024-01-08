@@ -1,5 +1,13 @@
-import Link from "next/link";
+import Features from "./features";
+import Footer from "./footer";
+import Hero from "./hero";
 
 export default function Landing() {
-  return <div>This is the landing page.</div>;
+  return (
+    <div>
+      <Hero />
+      <Features />
+      <Footer />
+    </div>
+  );
 }
