@@ -38,10 +38,7 @@ export default function RootLayout({
           <ClerkProvider>
             <main className="min-h-screen w-full">
               <Navbar />
-              <SignedIn>
-                <div className="mt-14"></div>
-              </SignedIn>
-              {children}
+              <div className="pt-14">{children}</div>
             </main>
             <Toaster />
           </ClerkProvider>
