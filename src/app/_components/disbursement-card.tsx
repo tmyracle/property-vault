@@ -108,7 +108,8 @@ export function DisbursementCard({
         <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
           <div className="text-sm font-medium text-gray-900">Disburse to</div>
           <div className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
-            {disbursement.distributeTo === "property_owner" ? (
+            {disbursement.distributeTo === "property_owner" &&
+            disbursement.propertyOwner ? (
               <div>
                 <div className="text-sm">{disbursement.propertyOwner.name}</div>
                 <div className="text-sm text-muted-foreground">

@@ -23,7 +23,6 @@ export function DisbursementsTableRowActions<
   TData extends DisbursementRequest,
 >({ row }: DisbursementsTableRowActionsProps<TData>) {
   const disbursementRow = disbursementRequestSchema.parse(row.original);
-  //const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <DropdownMenu>
