@@ -8,6 +8,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { TRPCReactProvider } from "~/trpc/react";
 import { Navbar } from "~/app/_components/nav/navbar";
 import { Toaster } from "~/app/_components/ui/toaster";
+import { SignedIn } from "@clerk/nextjs";
 
 export const fontSans = Inter({
   subsets: ["latin"],
@@ -37,6 +38,9 @@ export default function RootLayout({
           <ClerkProvider>
             <main className="min-h-screen w-full">
               <Navbar />
+              <SignedIn>
+                <div className="mt-14"></div>
+              </SignedIn>
               {children}
             </main>
             <Toaster />
