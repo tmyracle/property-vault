@@ -13,7 +13,7 @@ import { StatusBadge } from "../disbursement-card";
 
 interface ExtendedDisbursementRequest extends DisbursementRequest {
   case: Case;
-  propertyOwner: PropertyOwner;
+  propertyOwner: PropertyOwner | null;
   requester: string;
 }
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

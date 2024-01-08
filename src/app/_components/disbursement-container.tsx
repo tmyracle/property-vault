@@ -15,7 +15,7 @@ import { useSearchParams } from "next/navigation";
 
 export interface ExtendedDisbursementRequest extends DisbursementRequest {
   case: Case;
-  propertyOwner: ExtendedPropertyOwner;
+  propertyOwner: ExtendedPropertyOwner | null;
   requester: string;
 }
 
