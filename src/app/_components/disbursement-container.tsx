@@ -17,6 +17,7 @@ export interface ExtendedDisbursementRequest extends DisbursementRequest {
   case: Case;
   propertyOwner: ExtendedPropertyOwner | null;
   requester: string;
+  reviewer: string | null;
 }
 
 interface ExtendedPropertyOwner extends PropertyOwner {

@@ -8,7 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "~/app/_components/ui/card";
-import { useUser } from "@clerk/nextjs";
+import { useOrganization, useUser } from "@clerk/nextjs";
 import { Button } from "~/app/_components/ui/button";
 import { Badge } from "~/app/_components/ui/badge";
 import { Separator } from "~/app/_components/ui/separator";
@@ -17,6 +17,8 @@ import { api } from "~/trpc/react";
 import { useToast } from "~/app/_components/ui/use-toast";
 import { useRouter, useSearchParams } from "next/navigation";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import DisbursementRequestReport from "./reports/disbursement-request-report";
 
 interface DisbursementCardProps {
   disbursement: ExtendedDisbursementRequest;
@@ -29,6 +31,7 @@ export function DisbursementCard({
   setSelectedDisbursementRequest,
 }: DisbursementCardProps) {
   const { user } = useUser();
+  const { organization } = useOrganization();
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -96,6 +99,17 @@ export function DisbursementCard({
             <StatusBadge status={disbursement.status} />
           </div>
         </div>
+        {disbursement.status !== "pending" ? (
+          <>
+            <Separator />
+            <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
+              <div className="text-sm font-medium text-gray-900">Reviewer</div>
+              <div className="mt-1 text-sm leading-6 text-gray-700 sm:col-span-2 sm:mt-0">
+                {disbursement.reviewer}
+              </div>
+            </div>
+          </>
+        ) : null}
         <Separator />
         <div className="py-4 sm:grid sm:grid-cols-3 sm:gap-4">
           <div className="text-sm font-medium text-gray-900">Description</div>
@@ -160,6 +174,36 @@ export function DisbursementCard({
               >
                 Reject
               </Button>
+            </div>
+          </CardFooter>
+        </>
+      ) : null}
+      {user &&
+      disbursement.status === "approved" &&
+      disbursement.propertyOwner ? (
+        <>
+          <Separator className="mb-6" />
+          <CardFooter>
+            <div className="flew-col flex w-full items-center justify-between space-x-4">
+              <PDFDownloadLink
+                className="inline-flex h-10 w-full items-center justify-center whitespace-nowrap rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground ring-offset-background transition-colors hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                document={
+                  <DisbursementRequestReport
+                    name={disbursement.propertyOwner.name}
+                    address={disbursement.propertyOwner.addresses[0]!}
+                    amount={disbursement.amount}
+                    case_number={disbursement.case.caseNumber}
+                    date={new Date().toLocaleDateString()}
+                    supervisor={disbursement.reviewer!}
+                    department_name={organization?.name ?? ""}
+                  />
+                }
+                fileName="disbursement.pdf"
+              >
+                {({ loading }) =>
+                  loading ? "Loading document..." : "Download request form"
+                }
+              </PDFDownloadLink>
             </div>
           </CardFooter>
         </>
