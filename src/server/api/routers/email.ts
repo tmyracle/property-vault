@@ -23,7 +23,9 @@ export const emailRouter = createTRPCRouter({
       });
 
       const emails: string[] = users
-        .filter((user) => user.publicMetadata?.role === "admin")
+        .filter((user) =>
+          ["admin", "supervisor"].includes(user.publicMetadata?.role as string),
+        )
         .map(
           (user) =>
             user.emailAddresses.find(
