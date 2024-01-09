@@ -1,6 +1,6 @@
 # PropertyVault
 
-This is an application for police departments and other agencies to manage the assets in their property room.
+This is an application for police departments and other agencies to manage the assets in their property room. The production version is hosted at [usepropertyvault.com](https://usepropertyvault.com).
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
