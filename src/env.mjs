@@ -19,6 +19,7 @@ export const env = createEnv({
       .default("development"),
     CLERK_SECRET_KEY: z.string().optional(),
     RESEND_API_KEY: z.string(),
+    DOMAIN: z.string(),
   },
 
   /**
@@ -54,6 +55,7 @@ export const env = createEnv({
     NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL:
       process.env.NEXT_PUBLIC_CLERK_AFTER_SIGN_UP_URL,
     NEXT_PUBLIC_DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
+    DOMAIN: process.env.NEXT_PUBLIC_DOMAIN,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

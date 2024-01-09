@@ -33,7 +33,12 @@ export const emailRouter = createTRPCRouter({
             )?.emailAddress ?? "",
         );
 
-      const response = await fetch(`${env.NEXT_PUBLIC_DOMAIN}/api/send`, {
+      console.log(
+        "Attempting to send email to endpoint:",
+        `${env.DOMAIN}/api/send`,
+      );
+
+      const response = await fetch(`${env.DOMAIN}/api/send`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
