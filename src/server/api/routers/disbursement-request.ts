@@ -201,17 +201,21 @@ export const disbursementRequestRouter = createTRPCRouter({
       }
     };
 
-    const requestsWithUser = requests.map((request) => {
-      const user = users.find(
+    const requestsWithUsers = requests.map((request) => {
+      const requesterUser = users.find(
         (user) => user.publicUserData?.userId === request.createdBy,
+      );
+      const reviewerUser = users.find(
+        (user) => user.publicUserData?.userId === request.reviewedBy,
       );
       return {
         ...request,
-        requester: user ? buildName(user) : "",
+        requester: requesterUser ? buildName(requesterUser) : "",
+        reviewer: reviewerUser ? buildName(reviewerUser) : "",
       };
     });
 
-    return requestsWithUser;
+    return requestsWithUsers;
   }),
 
   updateRequest: protectedProcedure
@@ -235,6 +239,9 @@ export const disbursementRequestRouter = createTRPCRouter({
         .update(disbursementRequests)
         .set({
           status: input.status,
+          reviewedBy: ["approved", "rejected"].includes(input.status)
+            ? ctx.auth.userId
+            : null,
         })
         .where(eq(disbursementRequests.id, input.id));
     }),

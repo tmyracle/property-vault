@@ -134,6 +134,7 @@ export const disbursementRequests = mysqlTable("disbursement_request", {
   amount: decimal("amount", { precision: 19, scale: 4 }).notNull(),
   slug: varchar("slug", { length: 256 }),
   createdBy: varchar("created_by", { length: 256 }).notNull(),
+  reviewedBy: varchar("reviewed_by", { length: 256 }),
   orgId: varchar("org_id", { length: 256 }).notNull(),
 });
 

@@ -55,7 +55,7 @@ export const NewDisbursementRequestTemplate: React.FC<
             <Button
               style={{ padding: "12px 20px" }}
               className="rounded bg-[#000000] text-center text-[12px] font-semibold text-white no-underline"
-              href={`${env.NEXT_PUBLIC_DOMAIN}/disbursements?id=${slug}`}
+              href={`${env.NEXT_PUBLIC_APP_DOMAIN}/disbursements?id=${slug}`}
             >
               View request
             </Button>
@@ -63,10 +63,10 @@ export const NewDisbursementRequestTemplate: React.FC<
           <Text className="text-[14px] leading-[24px] text-black">
             or copy and paste this URL into your browser:{" "}
             <Link
-              href={`${env.NEXT_PUBLIC_DOMAIN}/disbursements?id=${slug}`}
+              href={`${env.NEXT_PUBLIC_APP_DOMAIN}/disbursements?id=${slug}`}
               className="text-blue-600 no-underline"
             >
-              {`${env.NEXT_PUBLIC_DOMAIN}/disbursements?id=${slug}`}
+              {`${env.NEXT_PUBLIC_APP_DOMAIN}/disbursements?id=${slug}`}
             </Link>
           </Text>
           <Hr className="mx-0 my-[26px] w-full border border-solid border-[#eaeaea]" />
