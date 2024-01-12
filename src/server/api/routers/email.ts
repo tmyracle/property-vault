@@ -58,4 +58,44 @@ export const emailRouter = createTRPCRouter({
         throw new Error("Email failed to send");
       }
     }),
+
+  sendRequestReviewedEmail: protectedProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+        status: z.string(),
+        caseNumber: z.string(),
+        requester: z.string(),
+      }),
+    )
+    .mutation(async ({ input, ctx }) => {
+      const requester = await clerkClient.users.getUser(input.requester);
+      const email =
+        requester?.emailAddresses.find(
+          (emailAddress) => emailAddress.id === requester.primaryEmailAddressId,
+        )?.emailAddress ?? "";
+
+      const response = await fetch(`${env.DOMAIN}/api/send`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${await ctx.auth.getToken()}`,
+        },
+        body: JSON.stringify({
+          emails: [email],
+          emailProps: {
+            slug: input.slug,
+            status: input.status,
+            caseNumber: input.caseNumber,
+          },
+          templateType: "disbursementRequestReviewed",
+        }),
+      });
+
+      if (response.ok) {
+        return { message: "Email sent!" };
+      } else {
+        throw new Error("Email failed to send");
+      }
+    }),
 });

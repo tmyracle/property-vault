@@ -244,6 +244,13 @@ export const disbursementRequestRouter = createTRPCRouter({
             : null,
         })
         .where(eq(disbursementRequests.id, input.id));
+
+      return await ctx.db.query.disbursementRequests.findFirst({
+        where: eq(disbursementRequests.id, input.id),
+        with: {
+          case: true,
+        },
+      });
     }),
 
   getUniqueCaseNumbers: protectedProcedure.query(async ({ ctx }) => {

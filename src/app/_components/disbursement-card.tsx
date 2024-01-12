@@ -35,11 +35,23 @@ export function DisbursementCard({
   const { toast } = useToast();
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  const sendRequestReviewedEmailMutation =
+    api.email.sendRequestReviewedEmail.useMutation();
   const updateRequest = api.disbursementRequest.updateRequest.useMutation({
     onSuccess: (data) => {
       toast({
         description: "Disbursement request updated",
       });
+      if (data?.slug && data.status && data.case.caseNumber && data.createdBy) {
+        sendRequestReviewedEmailMutation.mutate({
+          slug: data.slug,
+          status: data.status,
+          caseNumber: data.case.caseNumber,
+          requester: data.createdBy,
+        });
+      }
+
       router.refresh();
       setSelectedDisbursementRequest(data);
     },
