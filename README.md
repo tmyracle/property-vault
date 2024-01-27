@@ -19,4 +19,4 @@ Follow the deployment guides for T3 stack apps for [Vercel](https://create.t3.gg
 
 ## Contributing
 
-To contribute, please see our [contribution guide](https://github.com/tmyracle/property-vault/blob/main/CONTRIBUTING.md).
+To contribute, please see our [contribution guide](https://github.com/tmyracle/property-vault/blob/main/.github/CONTRIBUTING.md).
