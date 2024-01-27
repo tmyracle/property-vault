@@ -1,7 +1,25 @@
 {
   "name": "property-room",
-  "version": "0.1.0",
+  "version": "0.0.1",
+  "description": "Property room management for law enforcement agencies",
   "private": true,
+  "author": "Tyler Myracle (https://tylermyracle.com)",
+  "keywords": [
+    "nextjs",
+    "react",
+    "drizzle",
+    "typescript",
+    "shadcn/ui"
+  ],
+  "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tmyracle/property-vault.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tmyracle/property-vault/issues"
+  },
+  "homepage": "https://github.com/tmyracle/property-vault#readme",
   "scripts": {
     "build": "next build",
     "db:push": "dotenv drizzle-kit push:mysql",
